@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'PGCocoa' target in the 'PGCocoa' project.
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
