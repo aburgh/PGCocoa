@@ -26,11 +26,34 @@ void simpleTest(PGConnection *conn)
 	}
 }
 
+void test1(PGConnection *conn)
+{
+	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	PGResult *result = [conn executeQuery:@"insert into testnums values ($1, $2, $3, $4, $5);" parameters:params];
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
+}
 
 void test2(PGConnection *conn)
 {
 	NSArray *params = [NSArray arrayWithObjects:[NSNumber numberWithInt:4], @"Veryl", @"Burghardt", nil];
 	PGResult *result = [conn executeQuery:@"insert into abperson(rowid, first, last) values( $1, $2, $3);" parameters:params];
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
+}
+
+void test3(PGConnection *conn)
+{
+//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+//	PGResult *result = [conn executeQuery:@"insert into testnums values ($1, $2, $3, $4, $5);" parameters:params];
+	NSArray *params = [NSArray arrayWithObjects:[NSNumber numberWithDouble:10023445.98373], nil];
+	PGResult *result = [conn executeQuery:@"insert into testnums (f2) values ($1);" parameters:params];
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
+}
+
+void test4(PGConnection *conn)
+{
+	NSArray *params = [NSArray arrayWithObjects:[@"Some sample data" dataUsingEncoding:NSUTF8StringEncoding], nil];
+//	NSArray *params = [NSArray arrayWithObjects:[NSData data], nil];
+	PGResult *result = [conn executeQuery:@"insert into testnums (data) values ($1);" parameters:params];
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
 }
 
@@ -44,7 +67,10 @@ int main(int argc, char *argv[])
 	if (![conn connect]) goto bail;
 
 //	simpleTest(conn);
-	test2(conn);
+	test1(conn);
+//	test2(conn);
+//	test3(conn);
+//	test4(conn);
 	
 //	[conn close];
 //	[conn release];

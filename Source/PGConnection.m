@@ -57,9 +57,11 @@
 
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params
 {
+	// Consider adding parameter for array of "types", which are a custom constants, so as to avoid isKindOfClass
+	
 	int nparams = [params count];
 	Oid *types		= malloc(nparams * sizeof(Oid));
-	double *values	= malloc(nparams * sizeof(double));
+	double *values	= malloc(nparams * sizeof(double));  // TODO: use struct with a union of double, long long. malloc sizeof(struct)
 	char **valueRefs= malloc(nparams * sizeof(char *));
 	int *lengths	= malloc(nparams * sizeof(int));
 	int *formats	= malloc(nparams * sizeof(int));
@@ -67,8 +69,6 @@
 	for (int i = 0; i < nparams; i++) {
 		id param = [params objectAtIndex:i];
 		
-//		Class class = [param class];
-//		
 		if ([param isKindOfClass:[NSString class]]) {
 			*(types + i) = 25;	// text
 			*(valueRefs + i) = (char *)[param UTF8String];
@@ -77,11 +77,12 @@
 		}
 		else if ([param isKindOfClass:[NSDate class]]) {
 			// TODO
-			*(types + i) = 702; // abstime
-			*(values + i) = 0;
+			*(types + i) = 1184; // timestamp == 1114,  timestamptz == 1184
+			NSTimeInterval interval = [param timeIntervalSinceReferenceDate] + 31622400.0; // timestamp(tz) ref date == 2000-01-01 midnight
+			*(long long *)(values + i) = NSSwapHostLongLongToBig(*(long long *)&interval);  // cast needed to prevent converting swap result to a double
 			*(valueRefs + i) = (char *)(values + i);
-			*(lengths + i) = 0;
-			*(formats + i) = 0;
+			*(lengths + i) = 8;
+			*(formats + i) = 1;
 		}
 		else if ([param isKindOfClass:[NSData class]]) {
 			*(types + i) = 17;  // bytea
@@ -91,49 +92,36 @@
 		}
 		else if ([param isKindOfClass:[NSNumber class]]) {
 			
-			[param getValue:(values + i)];
-			*(valueRefs + i) = (char *)(values + i);
-			*(formats + i) = 1;
-
 			const char *objCType = [param objCType];
 			switch (*objCType) {
 				case 'c':
-					*(types + i) = 17; // bytea
-					*(lengths + i) = sizeof(char);
-					break;
 				case 's':
-					*(types + i) = 21; // int2
-					*(lengths + i) = sizeof(short);
-					*(values + i) = NSSwapHostShortToBig(*(values + i));
-					break;
 				case 'i':
-					*(types + i) = 23; // int4
-					*(lengths + i) = sizeof(int);
-					*(values + i) = NSSwapHostIntToBig(*(values + i));
-					break;
 				case 'q':
 					*(types + i) = 20; // int8
+					long long tmpLongLong = [param longLongValue];
+					*(long long *)(values + i) = NSSwapHostLongLongToBig(tmpLongLong); // cast needed to prevent converting swap result to a double
 					*(lengths + i) = sizeof(long long);
-					*(values + i) = NSSwapHostLongLongToBig(*(values + i));
 					break;
 				case 'f':
-					*(types + i) = 700; // float4
-					*(lengths + i) = sizeof(float);
-					*(values + i) = NSSwapHostIntToBig(*(values + i));
-					break;
 				case 'd':
-					*(types + i) = 701; // float8
+					*(types + i) = 701; // float4 = 700, float8 == 701
+					double tmpDouble = [param doubleValue];
+					*(long long *)(values + i) = NSSwapHostLongLongToBig(*(long long *)&tmpDouble); // cast needed to prevent converting swap result to a double
 					*(lengths + i) = sizeof(double);
-					*(values + i) = NSSwapHostLongLongToBig(*(values + i));
 					break;
-				default:
-					// TODO: throw exception
+				default: 
+					@throw([NSException exceptionWithName:NSInvalidArgumentException
+												   reason:@"Unsupported NSNumber objCType" 
+												 userInfo:nil]);
 					break;
 			}
+
+			*(valueRefs + i) = (char *)(values + i);
+			*(formats + i) = 1;
 		}
 	}
 	
-//	PGresult *result = PQprepare(_connection, " ", [query UTF8String], [params count], NULL);
 	PGresult *result = PQexecParams(_connection, [query UTF8String], nparams, types, (const char * const *) valueRefs, lengths, formats, 1);
 	free(types);
 	free(values);
