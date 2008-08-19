@@ -33,3 +33,17 @@
 @end
 
 extern NSString *PostgreSQLErrorDomain;
+
+
+// Connection Parameter Keys
+extern NSString *PGConnectionParameterHostKey;
+extern NSString *PGConnectionParameterHostAddressKey;
+extern NSString *PGConnectionParameterPortKey;
+extern NSString *PGConnectionParameterDatabaseNameKey;
+extern NSString *PGConnectionParameterUsernameKey;
+extern NSString *PGConnectionParameterPasswordKey;
+extern NSString *PGConnectionParameterConnectionTimeoutKey;
+extern NSString *PGConnectionParameterOptionsKey;
+extern NSString *PGConnectionParameterSSLModeKey;
+extern NSString *PGConnectionParameterKerberosServiceNameKey;
+extern NSString *PGConnectionParameterServiceNameKey;

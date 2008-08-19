@@ -169,3 +169,18 @@
 @end
 
 NSString *PostgreSQLErrorDomain = @"PostgreSQLErrorDomain";
+
+// Connection Parameter Keys
+NSString *PGConnectionParameterHostKey = @"host";
+NSString *PGConnectionParameterHostAddressKey = @"hostaddr";
+NSString *PGConnectionParameterPortKey = @"port";
+NSString *PGConnectionParameterDatabaseNameKey = @"dbname";
+NSString *PGConnectionParameterUsernameKey = @"user";
+NSString *PGConnectionParameterPasswordKey = @"password";
+NSString *PGConnectionParameterConnectionTimeoutKey = @"connect_timeout";
+NSString *PGConnectionParameterOptionsKey = @"options";
+NSString *PGConnectionParameterSSLModeKey = @"sslmode";
+NSString *PGConnectionParameterKerberosServiceNameKey = @"krbsrvname";
+NSString *PGConnectionParameterServiceNameKey = @"service";
+
+

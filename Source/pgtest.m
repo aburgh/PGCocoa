@@ -42,8 +42,6 @@ void test2(PGConnection *conn)
 
 void test3(PGConnection *conn)
 {
-//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
-//	PGResult *result = [conn executeQuery:@"insert into testnums values ($1, $2, $3, $4, $5);" parameters:params];
 	NSArray *params = [NSArray arrayWithObjects:[NSNumber numberWithDouble:10023445.98373], nil];
 	PGResult *result = [conn executeQuery:@"insert into testnums (f2) values ($1);" parameters:params];
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
@@ -61,7 +59,7 @@ int main(int argc, char *argv[])
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:@"test", @"dbname", nil];
+	NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:@"test", PGConnectionParameterDatabaseNameKey, nil];
 	PGConnection *conn = [[PGConnection alloc] initWithParameters:params];
 	
 	if (![conn connect]) goto bail;
