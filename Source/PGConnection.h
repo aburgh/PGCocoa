@@ -11,6 +11,7 @@
 
 @class PGResult;
 
+
 @interface PGConnection : NSObject 
 {
 	PGconn *_connection;
@@ -32,18 +33,18 @@
 
 @end
 
-extern NSString *PostgreSQLErrorDomain;
+extern NSString *const PostgreSQLErrorDomain;
 
 
 // Connection Parameter Keys
-extern NSString *PGConnectionParameterHostKey;
-extern NSString *PGConnectionParameterHostAddressKey;
-extern NSString *PGConnectionParameterPortKey;
-extern NSString *PGConnectionParameterDatabaseNameKey;
-extern NSString *PGConnectionParameterUsernameKey;
-extern NSString *PGConnectionParameterPasswordKey;
-extern NSString *PGConnectionParameterConnectionTimeoutKey;
-extern NSString *PGConnectionParameterOptionsKey;
-extern NSString *PGConnectionParameterSSLModeKey;
-extern NSString *PGConnectionParameterKerberosServiceNameKey;
-extern NSString *PGConnectionParameterServiceNameKey;
+extern NSString *const PGConnectionParameterHostKey;
+extern NSString *const PGConnectionParameterHostAddressKey;
+extern NSString *const PGConnectionParameterPortKey;
+extern NSString *const PGConnectionParameterDatabaseNameKey;
+extern NSString *const PGConnectionParameterUsernameKey;
+extern NSString *const PGConnectionParameterPasswordKey;
+extern NSString *const PGConnectionParameterConnectionTimeoutKey;
+extern NSString *const PGConnectionParameterOptionsKey;
+extern NSString *const PGConnectionParameterSSLModeKey;
+extern NSString *const PGConnectionParameterKerberosServiceNameKey;
+extern NSString *const PGConnectionParameterServiceNameKey;

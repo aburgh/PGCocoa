@@ -9,6 +9,20 @@
 #import "PGConnection.h"
 #import "PGResult.h"
 
+union PGMaxSizeType {
+	long long	ll;
+	double		d;
+	int			i;
+	Oid			oid;
+};
+struct PGQueryParameter {
+	Oid					type;
+	union PGMaxSizeType	value;
+	char *				valueRef;
+	int *				length;
+	int *				format;
+};
+
 @implementation PGConnection
 
 - (id)initWithParameters:(NSDictionary *)params;
@@ -57,15 +71,16 @@
 
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params
 {
-	// Consider adding parameter for array of "types", which are a custom constants, so as to avoid isKindOfClass
-	
+	// PGQueryParameter is used to calculate sizeof, but the actual params must be ordered differently
 	int nparams = [params count];
-	Oid *types		= malloc(nparams * sizeof(Oid));
-	double *values	= malloc(nparams * sizeof(double));  // TODO: use struct with a union of double, long long. malloc sizeof(struct)
-	char **valueRefs= malloc(nparams * sizeof(char *));
-	int *lengths	= malloc(nparams * sizeof(int));
-	int *formats	= malloc(nparams * sizeof(int));
-
+	void *paramBytes = malloc(nparams * sizeof(struct PGQueryParameter));
+	
+	Oid *types		= paramBytes;
+	double *values	= (void *) types  + (nparams * sizeof(Oid));
+	char **valueRefs= (void *) values + (nparams * sizeof(union PGMaxSizeType));
+	int *lengths	= (void *) valueRefs + (nparams * sizeof(char *));
+	int *formats	= (void *) lengths + (nparams * sizeof(int));
+	
 	for (int i = 0; i < nparams; i++) {
 		id param = [params objectAtIndex:i];
 		
@@ -123,11 +138,8 @@
 	}
 	
 	PGresult *result = PQexecParams(_connection, [query UTF8String], nparams, types, (const char * const *) valueRefs, lengths, formats, 1);
-	free(types);
-	free(values);
-	free(valueRefs);
-	free(lengths);
-	free(formats);
+
+	free(paramBytes);
 
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
@@ -168,19 +180,19 @@
 
 @end
 
-NSString *PostgreSQLErrorDomain = @"PostgreSQLErrorDomain";
+NSString *const PostgreSQLErrorDomain = @"PostgreSQLErrorDomain";
 
 // Connection Parameter Keys
-NSString *PGConnectionParameterHostKey = @"host";
-NSString *PGConnectionParameterHostAddressKey = @"hostaddr";
-NSString *PGConnectionParameterPortKey = @"port";
-NSString *PGConnectionParameterDatabaseNameKey = @"dbname";
-NSString *PGConnectionParameterUsernameKey = @"user";
-NSString *PGConnectionParameterPasswordKey = @"password";
-NSString *PGConnectionParameterConnectionTimeoutKey = @"connect_timeout";
-NSString *PGConnectionParameterOptionsKey = @"options";
-NSString *PGConnectionParameterSSLModeKey = @"sslmode";
-NSString *PGConnectionParameterKerberosServiceNameKey = @"krbsrvname";
-NSString *PGConnectionParameterServiceNameKey = @"service";
+NSString *const PGConnectionParameterHostKey = @"host";
+NSString *const PGConnectionParameterHostAddressKey = @"hostaddr";
+NSString *const PGConnectionParameterPortKey = @"port";
+NSString *const PGConnectionParameterDatabaseNameKey = @"dbname";
+NSString *const PGConnectionParameterUsernameKey = @"user";
+NSString *const PGConnectionParameterPasswordKey = @"password";
+NSString *const PGConnectionParameterConnectionTimeoutKey = @"connect_timeout";
+NSString *const PGConnectionParameterOptionsKey = @"options";
+NSString *const PGConnectionParameterSSLModeKey = @"sslmode";
+NSString *const PGConnectionParameterKerberosServiceNameKey = @"krbsrvname";
+NSString *const PGConnectionParameterServiceNameKey = @"service";
 
 
