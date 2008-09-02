@@ -18,6 +18,7 @@
 
 - (id)_initWithResult:(PGresult *)result;
 
+- (NSArray *)fieldNames;
 - (NSUInteger)numberOfFields;
 - (NSUInteger)numberOfRows;
 

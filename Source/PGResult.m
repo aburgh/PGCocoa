@@ -23,17 +23,12 @@
 	return self;
 }
 
-- (NSUInteger)numberOfFields
-{
-	return (NSUInteger)PQnfields(_result);
-}
-
 - (NSArray *)fieldNames
 {
 	if (!_fieldNames) {
 		int count = PQnfields(_result);
 		NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:count];
-
+		
 		for (int i = 0; i < count; i++) {
 			//		printf("Field: %s  type: %i\n", PQfname(result, i), PQftype(result, i));
 			NSString *name = [[NSString alloc] initWithCString:PQfname(_result, i) encoding:NSUTF8StringEncoding];
@@ -45,6 +40,12 @@
 	}
 	return _fieldNames;
 }
+
+- (NSUInteger)numberOfFields
+{
+	return (NSUInteger)PQnfields(_result);
+}
+
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum
 {
@@ -97,6 +98,7 @@
 			
 - (void)dealloc
 {
+	[_fieldNames release];
 	if (_result) PQclear(_result);
 	[super dealloc];
 }

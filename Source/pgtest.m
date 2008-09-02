@@ -83,6 +83,12 @@ void test5(PGConnection *conn)
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
 }
 
+void test6(PGConnection *conn)
+{
+	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;"];
+	NSLog(@"Headers: %@", [[result fieldNames] componentsJoinedByString:@", "]);
+}
+
 
 int main(int argc, char *argv[]) 
 {
@@ -98,7 +104,8 @@ int main(int argc, char *argv[])
 //	test2(conn);
 //	test3(conn);
 //	test4(conn);
-	test5(conn);
+//	test5(conn);
+	test6(conn);
 	
 //	[conn close];
 //	[conn release];
