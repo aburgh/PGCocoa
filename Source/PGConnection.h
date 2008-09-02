@@ -10,6 +10,7 @@
 #include "libpq-fe.h"
 
 @class PGResult;
+@class PGPreparedQuery;
 
 
 @interface PGConnection : NSObject 
@@ -25,11 +26,14 @@
 
 - (PGResult *)executeQuery:(NSString *)query;
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params;
+- (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes;
 
 - (NSString *)errorMessage;
 - (NSError *)error;
 
 - (PGTransactionStatusType)transactionStatus;
+
+- (PGconn *)_conn;
 
 @end
 

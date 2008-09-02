@@ -10,6 +10,10 @@
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		9610C08B0E22450D000E25B2 /* flash_image_importer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9610C08A0E22450D000E25B2 /* flash_image_importer.c */; };
+		96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C340E6942AE00325EE2 /* PGPreparedQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976C350E6942AE00325EE2 /* PGPreparedQuery.m */; };
+		96976C450E69864700325EE2 /* PGInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C440E69864700325EE2 /* PGInternal.h */; settings = {ATTRIBUTES = (); }; };
+		96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C490E6988A500325EE2 /* PGCocoa.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A56A480E5260D6005D0556 /* PGResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A460E5260D6005D0556 /* PGResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A56A490E5260D6005D0556 /* PGResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A56A470E5260D6005D0556 /* PGResult.m */; };
 		96A56A4C0E526E14005D0556 /* PGError.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A4A0E526E14005D0556 /* PGError.h */; };
@@ -50,6 +54,10 @@
 		9610B7440E223E1B000E25B2 /* pgsql */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pgsql; path = /usr/local/pgsql; sourceTree = "<absolute>"; };
 		9610C0890E22450D000E25B2 /* flash_image_importer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flash_image_importer.h; sourceTree = "<group>"; };
 		9610C08A0E22450D000E25B2 /* flash_image_importer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flash_image_importer.c; sourceTree = "<group>"; };
+		96976C340E6942AE00325EE2 /* PGPreparedQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPreparedQuery.h; sourceTree = "<group>"; };
+		96976C350E6942AE00325EE2 /* PGPreparedQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPreparedQuery.m; sourceTree = "<group>"; };
+		96976C440E69864700325EE2 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
+		96976C490E6988A500325EE2 /* PGCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCocoa.h; sourceTree = "<group>"; };
 		96A56A460E5260D6005D0556 /* PGResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGResult.h; sourceTree = "<group>"; };
 		96A56A470E5260D6005D0556 /* PGResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGResult.m; sourceTree = "<group>"; };
 		96A56A4A0E526E14005D0556 /* PGError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGError.h; sourceTree = "<group>"; };
@@ -146,6 +154,8 @@
 			children = (
 				96DAFDD20E2B50D800406253 /* PGConnection.h */,
 				96DAFDD30E2B50D800406253 /* PGConnection.m */,
+				96976C340E6942AE00325EE2 /* PGPreparedQuery.h */,
+				96976C350E6942AE00325EE2 /* PGPreparedQuery.m */,
 				96A56A460E5260D6005D0556 /* PGResult.h */,
 				96A56A470E5260D6005D0556 /* PGResult.m */,
 				96A56A4A0E526E14005D0556 /* PGError.h */,
@@ -176,6 +186,8 @@
 		32C88DFF0371C24200C91783 /* Other Source */ = {
 			isa = PBXGroup;
 			children = (
+				96976C490E6988A500325EE2 /* PGCocoa.h */,
+				96976C440E69864700325EE2 /* PGInternal.h */,
 				32DBCF5E0370ADEE00C91783 /* PGCocoa_Prefix.pch */,
 				9610C0890E22450D000E25B2 /* flash_image_importer.h */,
 				9610C08A0E22450D000E25B2 /* flash_image_importer.c */,
@@ -195,6 +207,9 @@
 				96DAFDD40E2B50D800406253 /* PGConnection.h in Headers */,
 				96A56A480E5260D6005D0556 /* PGResult.h in Headers */,
 				96A56A4C0E526E14005D0556 /* PGError.h in Headers */,
+				96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */,
+				96976C450E69864700325EE2 /* PGInternal.h in Headers */,
+				96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +350,7 @@
 				96DAFDD50E2B50D800406253 /* PGConnection.m in Sources */,
 				96A56A490E5260D6005D0556 /* PGResult.m in Sources */,
 				96A56A4D0E526E14005D0556 /* PGError.m in Sources */,
+				96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

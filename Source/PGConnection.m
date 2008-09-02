@@ -8,20 +8,9 @@
 
 #import "PGConnection.h"
 #import "PGResult.h"
+#import "PGPreparedQuery.h"
+#import "PGInternal.h"
 
-union PGMaxSizeType {
-	long long	ll;
-	double		d;
-	int			i;
-	Oid			oid;
-};
-struct PGQueryParameter {
-	Oid					type;
-	union PGMaxSizeType	value;
-	char *				valueRef;
-	int *				length;
-	int *				format;
-};
 
 @implementation PGConnection
 
@@ -144,6 +133,11 @@ struct PGQueryParameter {
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
 
+- (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes;
+{
+	return [[[PGPreparedQuery alloc] _initWithName:name query:sql types:paramTypes connection:self] autorelease];
+}
+
 
 - (NSString *)errorMessage;
 {
@@ -170,6 +164,8 @@ struct PGQueryParameter {
 {
 	return PQtransactionStatus(_connection);
 }
+
+- (PGconn *)_conn;  { return _connection; }
 
 - (void)dealloc
 {

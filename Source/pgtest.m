@@ -9,6 +9,7 @@
 
 #import <PGCocoa/PGConnection.h>
 #import <PGCocoa/PGResult.h>
+#import <PGCocoa/PGPreparedQuery.h>
 
 
 void simpleTest(PGConnection *conn)
@@ -55,6 +56,34 @@ void test4(PGConnection *conn)
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
 }
 
+void test5(PGConnection *conn)
+{
+//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithInt:1], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	PGPreparedQuery *query = [conn preparedQueryWithName:@"mytest"
+												   query:@"insert into testnums values ($1, $2, $3, $4, $5);" 
+												   types:params];
+	
+	[conn executeQuery:@"BEGIN"];
+	
+	[query bindValues:params];
+	PGResult *result = [query execute];
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
+	
+	[query bindValue:[NSDate date] atIndex:1];
+	[query bindValue:[NSNumber numberWithDouble:0.0] atIndex:3];
+	result = [query execute];
+	
+	[query bindValue:[NSDate date] atIndex:1];
+	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
+	result = [query execute];
+
+	[conn executeQuery:@"ROLLBACK"];
+	
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
+}
+
+
 int main(int argc, char *argv[]) 
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -65,10 +94,11 @@ int main(int argc, char *argv[])
 	if (![conn connect]) goto bail;
 
 //	simpleTest(conn);
-	test1(conn);
+//	test1(conn);
 //	test2(conn);
 //	test3(conn);
 //	test4(conn);
+	test5(conn);
 	
 //	[conn close];
 //	[conn release];
