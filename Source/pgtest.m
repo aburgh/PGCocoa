@@ -58,13 +58,13 @@ void test4(PGConnection *conn)
 
 void test5(PGConnection *conn)
 {
-//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
-	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithInt:1], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithInt:1], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
 	PGPreparedQuery *query = [conn preparedQueryWithName:@"mytest"
 												   query:@"insert into testnums values ($1, $2, $3, $4, $5);" 
 												   types:params];
 	
-	[conn executeQuery:@"BEGIN"];
+	[conn beginTransaction];
 	
 	[query bindValues:params];
 	PGResult *result = [query execute];
@@ -78,7 +78,7 @@ void test5(PGConnection *conn)
 	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
 	result = [query execute];
 
-	[conn executeQuery:@"ROLLBACK"];
+	[conn commitTransaction];
 	
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
 }

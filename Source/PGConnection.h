@@ -31,6 +31,9 @@
 - (NSString *)errorMessage;
 - (NSError *)error;
 
+- (BOOL)beginTransaction;
+- (BOOL)commitTransaction;
+- (BOOL)rollbackTransaction;
 - (PGTransactionStatusType)transactionStatus;
 
 - (PGconn *)_conn;

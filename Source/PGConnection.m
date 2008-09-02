@@ -159,7 +159,37 @@
 
 	return [NSError errorWithDomain:PostgreSQLErrorDomain code:-1 userInfo:info];
 }
+
+- (BOOL)beginTransaction
+{
+	PGresult *result = PQexec(_connection, "BEGIN");
+
+	ExecStatusType status = PQresultStatus(result);
+	PQclear(result);
+
+	return (status == PGRES_COMMAND_OK);
+}
+
+- (BOOL)commitTransaction
+{
+	PGresult *result = PQexec(_connection, "COMMIT");
+
+	ExecStatusType status = PQresultStatus(result);
+	PQclear(result);
+
+	return (status == PGRES_COMMAND_OK);
+}
+
+- (BOOL)rollbackTransaction
+{
+	PGresult *result = PQexec(_connection, "ROLLBACK");
+
+	ExecStatusType status = PQresultStatus(result);
+	PQclear(result);
 	
+	return (status == PGRES_COMMAND_OK);
+}
+
 - (PGTransactionStatusType)transactionStatus
 {
 	return PQtransactionStatus(_connection);
