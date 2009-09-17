@@ -12,7 +12,7 @@
 
 - (id)_initWithResult:(PGresult *)result
 {
-	printf("Result command status: %s\n", PQcmdStatus(result));
+//	printf("Result command status: %s\n", PQcmdStatus(result));
 	
 	if (self = [super init]) {
 		_result = result;
@@ -53,30 +53,58 @@
 	
 	if (PQgetisnull(_result, rowNum, fieldNum)) return [NSNull null];
 	
-	else {
-		BOOL isBinary = PQfformat(_result, fieldNum);
-
-		if (isBinary) {
-			// get Oid types with "SELECT oid, typname from pg_type;
-			Oid oid = PQftype(_result, fieldNum);
-			switch (oid) {
-				case 16: // bool
-					value = [NSNumber numberWithBool:(*(PQgetvalue(_result, rowNum, fieldNum)) == 't')  ?  YES : NO];
-					break;
-				case 17: // bytea
-				case 18: // int8
-				case 21: // int2
-				case 23: // int4
-					value = [NSNumber numberWithInt:(*(PQgetvalue(_result, rowNum, fieldNum)))];
-					break;
-				default:
-					value = [NSString stringWithCString:PQgetvalue(_result, rowNum, fieldNum) encoding:NSUTF8StringEncoding];
-					break;
-			}
+	BOOL isBinary = PQfformat(_result, fieldNum);
+	void *valuePtr = PQgetvalue(_result, rowNum, fieldNum);
+	
+	if (isBinary) {
+		// get Oid types with "SELECT oid, typname from pg_type;
+		Oid oid = PQftype(_result, fieldNum);
+		switch (oid) {
+			case 16: // bool
+				value = [NSNumber numberWithBool:(*(char *)valuePtr == 't')  ?  YES : NO];
+				break;
+			case 17: // bytea
+				value = [NSData dataWithBytes:valuePtr 
+									   length:PQgetlength(_result, rowNum, fieldNum)];
+				break;
+			case 18: // char
+				value = [NSNumber numberWithChar:*(char *)valuePtr];
+				break;
+			case 21: {} // int2 
+				*(int *)valuePtr = NSSwapBigShortToHost(*(int *)valuePtr);
+				short *shortPtr = valuePtr;
+				value = [NSNumber numberWithShort:*shortPtr];
+				break;
+			case 23: {} // int4
+				*(int *)valuePtr = NSSwapBigIntToHost(*(int *)valuePtr);
+				value = [NSNumber numberWithInt:*(int *)valuePtr];
+				break;
+			case 20: {} // int8
+				*(long long *)valuePtr = NSSwapBigLongLongToHost(*(long long *)valuePtr);
+				value = [NSNumber numberWithLongLong:*(long long *)valuePtr];
+				break;
+			case 700: {} // float4
+				*(int *)valuePtr = NSSwapBigIntToHost(*(int *)valuePtr);
+				value = [NSNumber numberWithFloat:*(float *)valuePtr];
+				break;
+			case 701: {} // float8
+				*(long long *)valuePtr = NSSwapBigLongLongToHost(*(long long *)valuePtr);
+				value = [NSNumber numberWithDouble:*(double *)valuePtr];
+				break;
+			case 1114: {} // timestamp
+			case 1184: {} // timestamptz
+				*(long long *)valuePtr = NSSwapBigLongLongToHost(*(long long *)valuePtr);
+				NSTimeInterval interval = *(NSTimeInterval *)valuePtr;
+				interval -= 31622400.0;												// adjust for Postgres' reference date of 1/1/2000
+				value = [NSDate dateWithTimeIntervalSinceReferenceDate:interval];
+				break;
+			default:
+				value = [NSString stringWithCString:valuePtr encoding:NSUTF8StringEncoding];
+				break;
 		}
-		else value = [NSString stringWithCString:PQgetvalue(_result, rowNum, fieldNum) encoding:NSUTF8StringEncoding];
-
 	}
+	else value = [NSString stringWithCString:valuePtr encoding:NSUTF8StringEncoding];
+	
 	return value;
 }
 
@@ -142,7 +170,7 @@ NSError * NSErrorFromPGresult(PGresult *result)
 	NSString *reason = [[[NSString alloc] initWithCString:PQresultErrorMessage(result) encoding:NSUTF8StringEncoding] autorelease];
 	
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-						  @"Database Error", NSLocalizedDescriptionKey,
+						  desc, NSLocalizedDescriptionKey,
 						  reason, NSLocalizedRecoverySuggestionErrorKey,
 						  reason, NSLocalizedFailureReasonErrorKey,
 						  nil];

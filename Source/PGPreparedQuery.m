@@ -14,8 +14,33 @@
 
 @implementation PGPreparedQuery
 
+- (void)deallocate
+{
+	if (!_deallocated) {
+		char *query;
+		PGresult *result;
+		
+		if (asprintf(&query, "DEALLOCATE %s;", _nameCString) > 0) {
+
+			result = PQexec(_conn, query);
+
+			if (PQresultStatus(result) == PGRES_COMMAND_OK) 
+				_deallocated = YES;
+			else
+				fprintf(stderr, "Error deallocating prepared query: %@\n", PQresStatus(PQresultStatus(result)));
+
+			free(query);
+			
+		}
+		else {
+			perror("Error preparing DEALLOCATE");
+		}
+	}
+}
+
 - (void)dealloc
 {
+	if (!_deallocated) [self deallocate];
 	[_params release];
 	[_name release];
 	[_query release];
@@ -47,6 +72,8 @@
 			
 			[self bindValues:paramTypes];
 			
+			_deallocated = NO;
+
 			PGresult *result = PQprepare(_conn, _nameCString, [_query UTF8String], _nparams, _types);
 			if (PQresultStatus(result) != PGRES_COMMAND_OK) {
 				[self dealloc];
@@ -117,6 +144,12 @@
 		*(_valueRefs + i) = (char *)(_values + i);
 		*(_formats + i) = 1;
 	}
+	else if (value == [NSNull null]) {
+		*(_valueRefs + i) = NULL;
+		*(_lengths + i) = 0;  // ignored
+		*(_formats + i) = 0; 
+	}
+	
 }
 
 - (void)bindValues:(NSArray *)values;

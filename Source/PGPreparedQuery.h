@@ -24,6 +24,7 @@
 	NSMutableArray *_params;
 	int _nparams;
 	void *_paramBytes;
+	BOOL _deallocated;			// indicator for status of the prepared query 
 	
 	// The following are weak refs within _paramBytes
 	Oid *_types;
@@ -38,5 +39,7 @@
 - (void)bindValues:(NSArray *)values;
 
 - (PGResult *)execute;
+
+- (void)deallocate;
 
 @end

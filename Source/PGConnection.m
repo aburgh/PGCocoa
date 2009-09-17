@@ -153,8 +153,9 @@
 	if (!errorMessage) return nil;
 	
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-						  @"Database Error", NSLocalizedDescriptionKey,
-						  [self errorMessage], NSLocalizedFailureReasonErrorKey, 
+						  @"Database Connection Error", NSLocalizedDescriptionKey,
+						  errorMessage, NSLocalizedRecoverySuggestionErrorKey,
+						  errorMessage, NSLocalizedFailureReasonErrorKey, 
 						  nil];
 
 	return [NSError errorWithDomain:PostgreSQLErrorDomain code:-1 userInfo:info];

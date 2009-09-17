@@ -14,6 +14,13 @@
 		96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976C350E6942AE00325EE2 /* PGPreparedQuery.m */; };
 		96976C450E69864700325EE2 /* PGInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C440E69864700325EE2 /* PGInternal.h */; settings = {ATTRIBUTES = (); }; };
 		96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C490E6988A500325EE2 /* PGCocoa.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96976E120E6E143B00325EE2 /* PGQueryDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976E110E6E143B00325EE2 /* PGQueryDocument.m */; };
+		96976E170E6E14AF00325EE2 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976E160E6E14AF00325EE2 /* AppController.m */; };
+		96976E190E6E14CE00325EE2 /* PGQueryToolMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96976E180E6E14CE00325EE2 /* PGQueryToolMainMenu.xib */; };
+		96976E1B0E6E152300325EE2 /* PGQueryDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96976E1A0E6E152300325EE2 /* PGQueryDocument.xib */; };
+		96976E370E6E22B100325EE2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976E360E6E22B100325EE2 /* main.m */; };
+		96976E3C0E6E231000325EE2 /* PGCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* PGCocoa.framework */; };
+		96976E440E6E231B00325EE2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		96A56A480E5260D6005D0556 /* PGResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A460E5260D6005D0556 /* PGResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A56A490E5260D6005D0556 /* PGResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A56A470E5260D6005D0556 /* PGResult.m */; };
 		96A56A4C0E526E14005D0556 /* PGError.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A4A0E526E14005D0556 /* PGError.h */; };
@@ -23,9 +30,18 @@
 		96A56A940E527BAD005D0556 /* PGCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* PGCocoa.framework */; };
 		96DAFDD40E2B50D800406253 /* PGConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 96DAFDD20E2B50D800406253 /* PGConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96DAFDD50E2B50D800406253 /* PGConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 96DAFDD30E2B50D800406253 /* PGConnection.m */; };
+		96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163AD0E94F64E000AEA9A /* libpq-fe.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163ED0E951406000AEA9A /* postgres_ext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		96976E130E6E144D00325EE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = PGCocoa;
+		};
 		96A56A800E527630005D0556 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -58,6 +74,15 @@
 		96976C350E6942AE00325EE2 /* PGPreparedQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPreparedQuery.m; sourceTree = "<group>"; };
 		96976C440E69864700325EE2 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
 		96976C490E6988A500325EE2 /* PGCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCocoa.h; sourceTree = "<group>"; };
+		96976E010E6E135C00325EE2 /* PGQuery Tool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PGQuery Tool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96976E030E6E135C00325EE2 /* PGQuery Tool-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PGQuery Tool-Info.plist"; sourceTree = "<group>"; };
+		96976E100E6E143B00325EE2 /* PGQueryDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PGQueryDocument.h; path = "Source/PGQuery Tool/PGQueryDocument.h"; sourceTree = "<group>"; };
+		96976E110E6E143B00325EE2 /* PGQueryDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PGQueryDocument.m; path = "Source/PGQuery Tool/PGQueryDocument.m"; sourceTree = "<group>"; };
+		96976E150E6E14AF00325EE2 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppController.h; path = "Source/PGQuery Tool/AppController.h"; sourceTree = "<group>"; };
+		96976E160E6E14AF00325EE2 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppController.m; path = "Source/PGQuery Tool/AppController.m"; sourceTree = "<group>"; };
+		96976E180E6E14CE00325EE2 /* PGQueryToolMainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PGQueryToolMainMenu.xib; sourceTree = "<group>"; };
+		96976E1A0E6E152300325EE2 /* PGQueryDocument.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PGQueryDocument.xib; sourceTree = "<group>"; };
+		96976E360E6E22B100325EE2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/PGQuery Tool/main.m"; sourceTree = "<group>"; };
 		96A56A460E5260D6005D0556 /* PGResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGResult.h; sourceTree = "<group>"; };
 		96A56A470E5260D6005D0556 /* PGResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGResult.m; sourceTree = "<group>"; };
 		96A56A4A0E526E14005D0556 /* PGError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGError.h; sourceTree = "<group>"; };
@@ -68,6 +93,8 @@
 		96A56A8A0E5276C1005D0556 /* pgtest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = pgtest.m; sourceTree = "<group>"; };
 		96DAFDD20E2B50D800406253 /* PGConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGConnection.h; sourceTree = "<group>"; };
 		96DAFDD30E2B50D800406253 /* PGConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGConnection.m; sourceTree = "<group>"; };
+		96E163AD0E94F64E000AEA9A /* libpq-fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "libpq-fe.h"; path = "/usr/local/pgsql/include/libpq-fe.h"; sourceTree = "<absolute>"; };
+		96E163ED0E951406000AEA9A /* postgres_ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = postgres_ext.h; path = /usr/local/pgsql/include/postgres_ext.h; sourceTree = "<absolute>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +111,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96976DFF0E6E135C00325EE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96976E3C0E6E231000325EE2 /* PGCocoa.framework in Frameworks */,
+				96976E440E6E231B00325EE2 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +149,7 @@
 				9610B72F0E2236EA000E25B2 /* flash_image_importer */,
 				96A56A7B0E527628005D0556 /* PGResultTest.octest */,
 				96A56A850E52768D005D0556 /* pgtest */,
+				96976E010E6E135C00325EE2 /* PGQuery Tool.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -123,9 +160,11 @@
 				08FB77AEFE84172EC02AAC07 /* Classes */,
 				32C88DFF0371C24200C91783 /* Other Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
+				96976E0F0E6E13DE00325EE2 /* PGQuery Tool */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
 				96A56A7C0E527628005D0556 /* PGResultTest-Info.plist */,
+				96976E030E6E135C00325EE2 /* PGQuery Tool-Info.plist */,
 			);
 			name = PGCocoa;
 			sourceTree = "<group>";
@@ -145,6 +184,8 @@
 			children = (
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				089C1666FE841158C02AAC07 /* InfoPlist.strings */,
+				96976E180E6E14CE00325EE2 /* PGQueryToolMainMenu.xib */,
+				96976E1A0E6E152300325EE2 /* PGQueryDocument.xib */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -192,9 +233,23 @@
 				9610C0890E22450D000E25B2 /* flash_image_importer.h */,
 				9610C08A0E22450D000E25B2 /* flash_image_importer.c */,
 				96A56A8A0E5276C1005D0556 /* pgtest.m */,
+				96E163AD0E94F64E000AEA9A /* libpq-fe.h */,
+				96E163ED0E951406000AEA9A /* postgres_ext.h */,
 			);
 			name = "Other Source";
 			path = Source;
+			sourceTree = "<group>";
+		};
+		96976E0F0E6E13DE00325EE2 /* PGQuery Tool */ = {
+			isa = PBXGroup;
+			children = (
+				96976E100E6E143B00325EE2 /* PGQueryDocument.h */,
+				96976E110E6E143B00325EE2 /* PGQueryDocument.m */,
+				96976E150E6E14AF00325EE2 /* AppController.h */,
+				96976E160E6E14AF00325EE2 /* AppController.m */,
+				96976E360E6E22B100325EE2 /* main.m */,
+			);
+			name = "PGQuery Tool";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -210,6 +265,8 @@
 				96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */,
 				96976C450E69864700325EE2 /* PGInternal.h in Headers */,
 				96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */,
+				96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */,
+				96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +307,24 @@
 			productName = flash_image_importer.c;
 			productReference = 9610B72F0E2236EA000E25B2 /* flash_image_importer */;
 			productType = "com.apple.product-type.tool";
+		};
+		96976E000E6E135C00325EE2 /* PGQuery Tool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96976E060E6E135D00325EE2 /* Build configuration list for PBXNativeTarget "PGQuery Tool" */;
+			buildPhases = (
+				96976DFD0E6E135C00325EE2 /* Resources */,
+				96976DFE0E6E135C00325EE2 /* Sources */,
+				96976DFF0E6E135C00325EE2 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96976E140E6E144D00325EE2 /* PBXTargetDependency */,
+			);
+			name = "PGQuery Tool";
+			productName = "PGQuery Tool";
+			productReference = 96976E010E6E135C00325EE2 /* PGQuery Tool.app */;
+			productType = "com.apple.product-type.application";
 		};
 		96A56A7A0E527628005D0556 /* PGResultTest */ = {
 			isa = PBXNativeTarget;
@@ -304,6 +379,7 @@
 				9610B72E0E2236EA000E25B2 /* flash_image_importer */,
 				96A56A7A0E527628005D0556 /* PGResultTest */,
 				96A56A840E52768D005D0556 /* pgtest */,
+				96976E000E6E135C00325EE2 /* PGQuery Tool */,
 			);
 		};
 /* End PBXProject section */
@@ -314,6 +390,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96976DFD0E6E135C00325EE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96976E190E6E14CE00325EE2 /* PGQueryToolMainMenu.xib in Resources */,
+				96976E1B0E6E152300325EE2 /* PGQueryDocument.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +447,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		96976DFE0E6E135C00325EE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96976E120E6E143B00325EE2 /* PGQueryDocument.m in Sources */,
+				96976E170E6E14AF00325EE2 /* AppController.m in Sources */,
+				96976E370E6E22B100325EE2 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		96A56A770E527628005D0556 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -380,6 +475,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		96976E140E6E144D00325EE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* PGCocoa */;
+			targetProxy = 96976E130E6E144D00325EE2 /* PBXContainerItemProxy */;
+		};
 		96A56A810E527630005D0556 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* PGCocoa */;
@@ -414,6 +514,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_GC = supported;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -433,6 +534,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_OBJC_GC = supported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
@@ -505,6 +607,54 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = flash_image_importer;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		96976E040E6E135D00325EE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "PGQuery Tool-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "PGQuery Tool";
+			};
+			name = Debug;
+		};
+		96976E050E6E135D00325EE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "PGQuery Tool-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "PGQuery Tool";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -635,6 +785,15 @@
 			buildConfigurations = (
 				9610B7310E2236EB000E25B2 /* Debug */,
 				9610B7320E2236EB000E25B2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96976E060E6E135D00325EE2 /* Build configuration list for PBXNativeTarget "PGQuery Tool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96976E040E6E135D00325EE2 /* Debug */,
+				96976E050E6E135D00325EE2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -78,6 +78,9 @@ void test5(PGConnection *conn)
 	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
 	result = [query execute];
 
+	[query bindValue:[NSDate date] atIndex:1];
+	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
+	result = [query execute];
 	[conn commitTransaction];
 	
 	printf("Result: %s\n", [[[result error] description] UTF8String]);
@@ -87,8 +90,22 @@ void test6(PGConnection *conn)
 {
 	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;"];
 	NSLog(@"Headers: %@", [[result fieldNames] componentsJoinedByString:@", "]);
+	printf("Result: %s\n", [[[result error] description] UTF8String]);
 }
 
+void test7(PGConnection *conn)
+{
+	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;" parameters:[NSArray array]];
+	
+	printf("%s\n", [[[result fieldNames] componentsJoinedByString:@"\t"] UTF8String]);
+	
+	for (int i = 0; i < [result numberOfRows]; i++) {
+		for (int j = 0; j < [result numberOfFields]; j++) 
+			printf("%s\t", [[[result valueAtRowIndex:i fieldIndex:j] description] UTF8String]);
+		printf("\n");
+	}
+}
+			
 
 int main(int argc, char *argv[]) 
 {
@@ -104,8 +121,9 @@ int main(int argc, char *argv[])
 //	test2(conn);
 //	test3(conn);
 //	test4(conn);
-//	test5(conn);
-	test6(conn);
+	test5(conn);
+//	test6(conn);
+//	test7(conn);
 	
 //	[conn close];
 //	[conn release];
