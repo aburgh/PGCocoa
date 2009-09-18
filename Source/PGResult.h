@@ -10,7 +10,7 @@
 #include "libpq-fe.h"
 
 
-@interface PGResult : NSObject 
+@interface PGResult : NSObject <NSFastEnumeration>
 {
 	PGresult *_result;
 	NSArray *_fieldNames;
@@ -21,8 +21,10 @@
 - (NSArray *)fieldNames;
 - (NSUInteger)numberOfFields;
 - (NSUInteger)numberOfRows;
+- (NSArray *)rows;
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum;
+- (NSUInteger)indexForFieldName:(NSString *)name;
 
 - (ExecStatusType)status;
 - (NSError *)error;

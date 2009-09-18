@@ -10,3 +10,4 @@
 #import "PGConnection.h"
 #import "PGPreparedQuery.h"
 #import "PGResult.h"
+#import "PGRow.h"

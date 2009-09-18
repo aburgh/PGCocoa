@@ -32,6 +32,8 @@
 		96DAFDD50E2B50D800406253 /* PGConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 96DAFDD30E2B50D800406253 /* PGConnection.m */; };
 		96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163AD0E94F64E000AEA9A /* libpq-fe.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163ED0E951406000AEA9A /* postgres_ext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 96EAFC8D1061C69C00DB0100 /* PGRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96EAFC901061C69C00DB0100 /* PGRow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EAFC8E1061C69C00DB0100 /* PGRow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +97,8 @@
 		96DAFDD30E2B50D800406253 /* PGConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGConnection.m; sourceTree = "<group>"; };
 		96E163AD0E94F64E000AEA9A /* libpq-fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "libpq-fe.h"; path = "/usr/local/pgsql/include/libpq-fe.h"; sourceTree = "<absolute>"; };
 		96E163ED0E951406000AEA9A /* postgres_ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = postgres_ext.h; path = /usr/local/pgsql/include/postgres_ext.h; sourceTree = "<absolute>"; };
+		96EAFC8D1061C69C00DB0100 /* PGRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRow.h; sourceTree = "<group>"; };
+		96EAFC8E1061C69C00DB0100 /* PGRow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRow.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -201,6 +205,8 @@
 				96A56A470E5260D6005D0556 /* PGResult.m */,
 				96A56A4A0E526E14005D0556 /* PGError.h */,
 				96A56A4B0E526E14005D0556 /* PGError.m */,
+				96EAFC8D1061C69C00DB0100 /* PGRow.h */,
+				96EAFC8E1061C69C00DB0100 /* PGRow.m */,
 			);
 			name = Classes;
 			path = Source;
@@ -267,6 +273,7 @@
 				96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */,
 				96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */,
 				96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */,
+				96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +443,7 @@
 				96A56A490E5260D6005D0556 /* PGResult.m in Sources */,
 				96A56A4D0E526E14005D0556 /* PGError.m in Sources */,
 				96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */,
+				96EAFC901061C69C00DB0100 /* PGRow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,7 +522,6 @@
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_ENABLE_OBJC_GC = supported;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -534,7 +541,6 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_ENABLE_OBJC_GC = supported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
@@ -548,10 +554,11 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_OBJC_GC = supported;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = /usr/local/pgsql/lib;
@@ -566,9 +573,10 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_ENABLE_OBJC_GC = supported;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = /usr/local/pgsql/lib;

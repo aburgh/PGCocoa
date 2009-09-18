@@ -27,7 +27,7 @@
 			if (PQresultStatus(result) == PGRES_COMMAND_OK) 
 				_deallocated = YES;
 			else
-				fprintf(stderr, "Error deallocating prepared query: %@\n", PQresStatus(PQresultStatus(result)));
+				fprintf(stderr, "Error deallocating prepared query: %s\n", PQresStatus(PQresultStatus(result)));
 
 			free(query);
 			

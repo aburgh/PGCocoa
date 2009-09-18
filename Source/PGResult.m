@@ -8,6 +8,13 @@
 
 #import "PGResult.h"
 #import "PGConnection.h"
+#import "PGRow.h"
+
+@interface PGRow (PGRowPrivate)
+- (id)_initWithResult:(PGResult *)parent rowNumber:(NSInteger)index;
+@end
+
+
 @implementation PGResult
 
 - (id)_initWithResult:(PGresult *)result
@@ -25,19 +32,18 @@
 
 - (NSArray *)fieldNames
 {
-	if (!_fieldNames) {
+	@synchronized(self) {
+		if (_fieldNames) return _fieldNames;
+		
 		int count = PQnfields(_result);
-		NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:count];
+		_fieldNames = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for (int i = 0; i < count; i++) {
 			//		printf("Field: %s  type: %i\n", PQfname(result, i), PQftype(result, i));
 			NSString *name = [[NSString alloc] initWithCString:PQfname(_result, i) encoding:NSUTF8StringEncoding];
-			[names addObject:name];
-			[name release];
+			[(NSMutableArray *)_fieldNames addObject:name];
 		}
-		_fieldNames = [names copy];
-		[names release];
-	}
+	}	
 	return _fieldNames;
 }
 
@@ -46,6 +52,27 @@
 	return (NSUInteger)PQnfields(_result);
 }
 
+- (NSUInteger)numberOfRows
+{
+	return (NSUInteger)PQntuples(_result);
+}
+
+- (NSArray *)rows
+{
+	NSUInteger rowCount = [self numberOfRows];
+	NSMutableArray *rows = [NSMutableArray arrayWithCapacity:rowCount];
+	
+	for (NSUInteger i = 0; i < rowCount; i++) {
+		[rows addObject:[[[PGRow alloc] _initWithResult:self rowNumber:i] autorelease]];
+	}
+	
+	return rows;
+}
+
+- (NSUInteger)indexForFieldName:(NSString *)name
+{
+	return PQfnumber(_result, [name UTF8String]);
+}
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum
 {
@@ -108,15 +135,26 @@
 	return value;
 }
 
-				
-- (NSUInteger)numberOfRows
-{
-	return (NSUInteger)PQntuples(_result);
-}
-
 - (ExecStatusType)status
 {
 	return PQresultStatus(_result);
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len
+{
+	NSUInteger i, maxLen, index;
+	
+	maxLen = PQntuples(_result) - state->state;
+	maxLen = maxLen > len ? len : maxLen;
+	
+	for (i = 0, index = state->state; index < maxLen ; i++, index++) {
+		stackbuf[i] = [[[PGRow alloc] _initWithResult:self rowNumber:index] autorelease];
+	}
+	state->state = index;
+	state->itemsPtr = stackbuf;
+	state->mutationsPtr = (unsigned long *)self;  // Not sufficient if the instance is not read-only
+	
+	return i;
 }
 
 - (NSError *)error
@@ -130,6 +168,7 @@
 	if (_result) PQclear(_result);
 	[super dealloc];
 }
+
 
 @end
 
