@@ -3,7 +3,7 @@
 //  PGCocoa
 //
 //  Created by Aaron Burghardt on 7/14/08.
-//  Copyright 2008 No Company. All rights reserved.
+//  Copyright 2008. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
@@ -23,6 +23,7 @@
 - (id)initWithParameters:(NSDictionary *)params;
 
 - (BOOL)connect;
+- (void)disconnect;
 
 - (PGResult *)executeQuery:(NSString *)query;
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params;
