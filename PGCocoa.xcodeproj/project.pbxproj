@@ -72,6 +72,7 @@
 		9610B7440E223E1B000E25B2 /* pgsql */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pgsql; path = /usr/local/pgsql; sourceTree = "<absolute>"; };
 		9610C0890E22450D000E25B2 /* flash_image_importer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flash_image_importer.h; sourceTree = "<group>"; };
 		9610C08A0E22450D000E25B2 /* flash_image_importer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flash_image_importer.c; sourceTree = "<group>"; };
+		96381300122C984700A6D051 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; name = include; path = /usr/local/pgsql/include; sourceTree = "<absolute>"; };
 		96976C340E6942AE00325EE2 /* PGPreparedQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPreparedQuery.h; sourceTree = "<group>"; };
 		96976C350E6942AE00325EE2 /* PGPreparedQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPreparedQuery.m; sourceTree = "<group>"; };
 		96976C440E69864700325EE2 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
@@ -161,6 +162,7 @@
 		0867D691FE84028FC02AAC07 /* PGCocoa */ = {
 			isa = PBXGroup;
 			children = (
+				96381300122C984700A6D051 /* include */,
 				08FB77AEFE84172EC02AAC07 /* Classes */,
 				32C88DFF0371C24200C91783 /* Other Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
@@ -376,7 +378,11 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "PGCocoa" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* PGCocoa */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
