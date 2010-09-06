@@ -56,7 +56,7 @@
 			_connection = [conn retain];
 			_conn = [_connection _conn];
 			
-			_query = [query retain];
+			_query = [query copy];
 			_name = [name copy];
 			_nameCString = (char *)[_name UTF8String];
 			
