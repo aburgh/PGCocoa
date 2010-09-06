@@ -144,10 +144,10 @@
 {
 	NSUInteger i, maxLen, index;
 	
-	maxLen = PQntuples(_result) - state->state;
-	maxLen = maxLen > len ? len : maxLen;
+	index = state->state;
+	maxLen = PQntuples(_result);
 	
-	for (i = 0, index = state->state; index < maxLen ; i++, index++) {
+	for (i = 0; i < len && index < maxLen ; i++, index++) {
 		stackbuf[i] = [[[PGRow alloc] _initWithResult:self rowNumber:index] autorelease];
 	}
 	state->state = index;
@@ -172,10 +172,9 @@
 
 @end
 
-NSError * NSErrorFromPGresult(PGresult *result)
+NSString * NSStringFromPGresultStatus(ExecStatusType status)
 {
 	NSString *desc;	
-	ExecStatusType status = PQresultStatus(result);
 	
 	switch (status) {
 		case PGRES_EMPTY_QUERY:
@@ -205,11 +204,17 @@ NSError * NSErrorFromPGresult(PGresult *result)
 		default:
 			desc = @"Unknown database error";
 	}
-			
+	return desc;	
+}
+
+NSError * NSErrorFromPGresult(PGresult *result)
+{
+	ExecStatusType status = PQresultStatus(result);
+
 	NSString *reason = [[[NSString alloc] initWithCString:PQresultErrorMessage(result) encoding:NSUTF8StringEncoding] autorelease];
 	
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-						  desc, NSLocalizedDescriptionKey,
+						  NSStringFromPGresultStatus(status), NSLocalizedDescriptionKey,
 						  reason, NSLocalizedRecoverySuggestionErrorKey,
 						  reason, NSLocalizedFailureReasonErrorKey,
 						  nil];

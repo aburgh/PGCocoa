@@ -31,4 +31,5 @@
 
 @end
 
+NSString * NSStringFromPGresultStatus(ExecStatusType status);
 NSError * NSErrorFromPGresult(PGresult *result);
