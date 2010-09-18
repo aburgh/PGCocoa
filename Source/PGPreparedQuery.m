@@ -20,7 +20,7 @@
 		char *query;
 		PGresult *result;
 		
-		if (asprintf(&query, "DEALLOCATE %s;", _nameCString) > 0) {
+		if (asprintf(&query, "DEALLOCATE %s;", [_name UTF8String]) > 0) {
 
 			result = PQexec(_conn, query);
 
@@ -58,7 +58,6 @@
 			
 			_query = [query copy];
 			_name = [name copy];
-			_nameCString = (char *)[_name UTF8String];
 			
 			// PGQueryParameter is used to calculate sizeof, but the actual params must be ordered differently
 			_params = [paramTypes mutableCopy];
@@ -74,7 +73,7 @@
 			
 			_deallocated = NO;
 
-			PGresult *result = PQprepare(_conn, _nameCString, [_query UTF8String], _nparams, _types);
+			PGresult *result = PQprepare(_conn, [_name UTF8String], [_query UTF8String], _nparams, _types);
 			if (PQresultStatus(result) != PGRES_COMMAND_OK) {
 				[self dealloc];
 				self = nil;
@@ -164,7 +163,7 @@
 
 - (PGResult *)execute;
 {
-	PGresult *result = PQexecPrepared(_conn, _nameCString, _nparams, _valueRefs, _lengths, _formats, 1);
+	PGresult *result = PQexecPrepared(_conn, [_name UTF8String], _nparams, _valueRefs, _lengths, _formats, 1);
 	
 	return [[[PGResult alloc] _initWithResult:result] autorelease];	
 }

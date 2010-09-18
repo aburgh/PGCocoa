@@ -19,7 +19,6 @@
 	PGconn *_conn;				// weak ref
 	NSString *_query;
 	NSString *_name;
-	char *_nameCString;			// weak ref
 	
 	NSMutableArray *_params;
 	int _nparams;
