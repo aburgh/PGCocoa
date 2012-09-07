@@ -27,7 +27,7 @@
 			if (PQresultStatus(result) == PGRES_COMMAND_OK) 
 				_deallocated = YES;
 			else
-				fprintf(stderr, "Error deallocating prepared query: %s\n", PQresStatus(PQresultStatus(result)));
+				fprintf(stderr, "Error deallocating prepared query: %s\n",PQresultErrorMessage(result));
 
 			free(query);
 			
@@ -59,7 +59,7 @@
 			_query = [query copy];
 			_name = [name copy];
 			
-			// PGQueryParameter is used to calculate sizeof, but the actual params must be ordered differently
+			// PGQueryParameter is used to calculate sizeof, but the actual params are grouped as arrays of paramaters
 			_params = [paramTypes mutableCopy];
 			_nparams = [paramTypes count];
 			_paramBytes = malloc(_nparams * sizeof(struct PGQueryParameter));
