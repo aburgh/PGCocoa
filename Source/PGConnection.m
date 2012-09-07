@@ -26,11 +26,18 @@
 - (BOOL)connect
 {
 	NSArray *keys = [_params allKeys];
+
+	if ([keys containsObject:@"application_name"] == NO) {
+		NSString *name = [[NSProcessInfo processInfo] processName];
+		name = [name stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"]; // escape backlashes with double-backslash
+		name = [name stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];    // escape single quote with backslash-quote
+	}
+	
 	NSMutableString *connString = [NSMutableString string];
 
 	for (int i = 0; i < [keys count]; i++) {
 		NSString *key = [keys objectAtIndex:i];
-		[connString appendFormat:@"%@=%@ ", key, [_params objectForKey:key]];
+		[connString appendFormat:@"%@='%@' ", key, [_params objectForKey:key]];
 	}
 	
 	_connection = PQconnectdb([connString cStringUsingEncoding:NSUTF8StringEncoding]);
