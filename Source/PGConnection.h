@@ -20,6 +20,10 @@
 	NSDictionary *_params;
 }
 
+@property (readonly) NSString *errorMessage;
+@property (readonly) NSError  *error;
+@property (readonly) PGTransactionStatusType transactionStatus;
+
 - (id)initWithParameters:(NSDictionary *)params;
 
 - (BOOL)connect;
@@ -29,13 +33,9 @@
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params;
 - (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes;
 
-- (NSString *)errorMessage;
-- (NSError *)error;
-
 - (BOOL)beginTransaction;
 - (BOOL)commitTransaction;
 - (BOOL)rollbackTransaction;
-- (PGTransactionStatusType)transactionStatus;
 
 - (PGconn *)_conn;
 

@@ -92,13 +92,13 @@
 	int i = paramIndex;
 	[_params replaceObjectAtIndex:i withObject:value];
 	
-	if ([value isKindOfClass:[NSString class]]) {
+	if ([value isKindOfClass:NSString.class]) {
 		*(_types + i) = 25;	// text
 		*(_valueRefs + i) = (char *)[value UTF8String];
 		*(_lengths + i) = 0;  // ignored
 		*(_formats + i) = 0; 
 	}
-	else if ([value isKindOfClass:[NSDate class]]) {
+	else if ([value isKindOfClass:NSDate.class]) {
 		// TODO
 		*(_types + i) = 1184; // timestamp == 1114,  timestamptz == 1184
 		NSTimeInterval interval = [value timeIntervalSinceReferenceDate] + 31622400.0; // timestamp(tz) ref date == 2000-01-01 midnight
@@ -107,13 +107,13 @@
 		*(_lengths + i) = 8;
 		*(_formats + i) = 1;
 	}
-	else if ([value isKindOfClass:[NSData class]]) {
+	else if ([value isKindOfClass:NSData.class]) {
 		*(_types + i) = 17;  // bytea
 		*(_valueRefs + i) = (char *)[value bytes];
 		*(_lengths + i) = (int)[value length];
 		*(_formats + i) = 1;
 	}
-	else if ([value isKindOfClass:[NSNumber class]]) {
+	else if ([value isKindOfClass:NSNumber.class]) {
 		
 		const char *objCType = [value objCType];
 		switch (*objCType) {
@@ -143,7 +143,7 @@
 		*(_valueRefs + i) = (char *)(_values + i);
 		*(_formats + i) = 1;
 	}
-	else if (value == [NSNull null]) {
+	else if (value == NSNull.null) {
 		*(_valueRefs + i) = NULL;
 		*(_lengths + i) = 0;  // ignored
 		*(_formats + i) = 0; 
@@ -163,7 +163,7 @@
 
 - (PGResult *)execute;
 {
-	PGresult *result = PQexecPrepared(_conn, [_name UTF8String], _nparams, _valueRefs, _lengths, _formats, 1);
+	PGresult *result = PQexecPrepared(_conn, _name.UTF8String, _nparams, _valueRefs, _lengths, _formats, 1);
 	
 	return [[[PGResult alloc] _initWithResult:result] autorelease];	
 }

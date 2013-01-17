@@ -16,18 +16,17 @@
 	NSArray *_fieldNames;
 }
 
-- (id)_initWithResult:(PGresult *)result;
+@property (readonly) NSArray *fieldNames;
+@property (readonly) NSUInteger numberOfFields;
+@property (readonly) NSUInteger numberOfRows;
+@property (readonly) NSArray *rows;
+@property (readonly) ExecStatusType status;
+@property (readonly) NSError *error;
 
-- (NSArray *)fieldNames;
-- (NSUInteger)numberOfFields;
-- (NSUInteger)numberOfRows;
-- (NSArray *)rows;
+- (id)_initWithResult:(PGresult *)result;
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum;
 - (NSUInteger)indexForFieldName:(NSString *)name;
-
-- (ExecStatusType)status;
-- (NSError *)error;
 
 @end
 
