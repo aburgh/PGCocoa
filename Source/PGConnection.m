@@ -145,8 +145,7 @@
 	return [[[PGPreparedQuery alloc] _initWithName:name query:sql types:paramTypes connection:self] autorelease];
 }
 
-
-- (NSString *)errorMessage;
+- (NSString *)errorMessage
 {
 	char *errorCString = PQerrorMessage(_connection);
 	if (!errorCString) return nil;
@@ -196,6 +195,11 @@
 	PQclear(result);
 	
 	return (status == PGRES_COMMAND_OK);
+}
+
+- (ConnStatusType)status
+{
+	return PQstatus(_connection);
 }
 
 - (PGTransactionStatusType)transactionStatus

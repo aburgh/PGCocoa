@@ -22,6 +22,7 @@
 
 @property (readonly) NSString *errorMessage;
 @property (readonly) NSError  *error;
+@property (readonly) ConnStatusType status;
 @property (readonly) PGTransactionStatusType transactionStatus;
 
 - (id)initWithParameters:(NSDictionary *)params;
