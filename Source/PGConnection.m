@@ -3,7 +3,7 @@
 //  PGCocoa
 //
 //  Created by Aaron Burghardt on 7/14/08.
-//  Copyright 2008 No Company. All rights reserved.
+//  Copyright 2008. All rights reserved.
 //
 
 #import "PGConnection.h"
@@ -11,6 +11,11 @@
 #import "PGPreparedQuery.h"
 #import "PGInternal.h"
 
+#pragma mark - Prototypes
+
+NSInteger PGSecondsFromUTC(PGConnection *conn);
+
+#pragma mark -
 
 @implementation PGConnection
 
@@ -61,7 +66,7 @@
 - (PGResult *)executeQuery:(NSString *)query
 {
 	PGresult *result = PQexec(_connection, [query UTF8String]);
-	
+
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
 
@@ -207,6 +212,13 @@
 	return PQtransactionStatus(_connection);
 }
 
+- (NSString *)parameterStatus:(NSString *)paramName
+{
+	const char *status = PQparameterStatus(_connection, paramName.UTF8String);
+
+	return [NSString stringWithCString:status encoding:NSUTF8StringEncoding];
+}
+
 - (PGconn *)_conn;  { return _connection; }
 
 - (void)dealloc
@@ -217,6 +229,16 @@
 }
 
 @end
+
+NSInteger PGSecondsFromUTC(PGConnection *conn)
+{
+	NSString *tzName = [conn parameterStatus:@"TimeZone"];
+
+	NSTimeZone *zone = [NSTimeZone timeZoneWithName:tzName];
+
+	return zone.secondsFromGMT;
+}
+
 
 NSString *const PostgreSQLErrorDomain = @"PostgreSQLErrorDomain";
 

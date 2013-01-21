@@ -11,6 +11,10 @@
 #import "PGResult.h"
 #import "PGInternal.h"
 
+#pragma mark - Prototypes
+NSInteger PGSecondsFromUTC(PGConnection *connection);
+
+#pragma mark -
 
 @implementation PGPreparedQuery
 
@@ -164,8 +168,8 @@
 - (PGResult *)execute;
 {
 	PGresult *result = PQexecPrepared(_conn, _name.UTF8String, _nparams, _valueRefs, _lengths, _formats, 1);
-	
-	return [[[PGResult alloc] _initWithResult:result] autorelease];	
+
+	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
 
 @end

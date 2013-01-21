@@ -19,8 +19,6 @@
 
 - (id)_initWithResult:(PGresult *)result
 {
-//	printf("Result command status: %s\n", PQcmdStatus(result));
-	
 	if (self = [super init]) {
 		_result = result;
 	}
@@ -36,13 +34,15 @@
 		if (_fieldNames) return _fieldNames;
 		
 		int count = PQnfields(_result);
-		_fieldNames = [[NSMutableArray alloc] initWithCapacity:count];
+		NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:count];
 		
 		for (int i = 0; i < count; i++) {
 			//		printf("Field: %s  type: %i\n", PQfname(result, i), PQftype(result, i));
 			NSString *name = [[NSString alloc] initWithCString:PQfname(_result, i) encoding:NSUTF8StringEncoding];
-			[(NSMutableArray *)_fieldNames addObject:name];
+			[names addObject:name];
 		}
+		_fieldNames = [names copy];
+		[names release];
 	}	
 	return _fieldNames;
 }
@@ -59,14 +59,16 @@
 
 - (NSArray *)rows
 {
-	NSUInteger rowCount = [self numberOfRows];
-	NSMutableArray *rows = [NSMutableArray arrayWithCapacity:rowCount];
+	NSUInteger rowCount = self.numberOfRows;
+	NSMutableArray *rows = [[NSMutableArray alloc] initWithCapacity:rowCount];
 	
 	for (NSUInteger i = 0; i < rowCount; i++) {
 		[rows addObject:[[[PGRow alloc] _initWithResult:self rowNumber:i] autorelease]];
 	}
-	
-	return rows;
+	NSArray *retval = [rows copy];
+	[rows release];
+
+	return retval;
 }
 
 - (NSUInteger)indexForFieldName:(NSString *)name
@@ -120,9 +122,15 @@
 				break;
 			case 1114: {} // timestamp
 			case 1184: {} // timestamptz
-				*(long long *)valuePtr = NSSwapBigLongLongToHost(*(long long *)valuePtr);
-				NSTimeInterval interval = *(NSTimeInterval *)valuePtr;
+				// The default storage for timestamps in PostgreSQL 8.4 is int64 in microseconds. Prior to
+				// 8.4, the default was a double, and is still a compile-time option. Supporting floats
+				// is an exercise for the reader. Hint: the integer_datetimes connection parameter reflects
+				// the server's setting.
+
+				int64_t tmp64 = NSSwapBigLongLongToHost(*(int64_t *)valuePtr);
+				NSTimeInterval interval = (NSTimeInterval) (tmp64 / 1000000);
 				interval -= 31622400.0;												// adjust for Postgres' reference date of 1/1/2000
+				interval += ((NSTimeInterval) (tmp64 % 1000000)) / 1000000 ;
 				value = [NSDate dateWithTimeIntervalSinceReferenceDate:interval];
 				break;
 			default:
