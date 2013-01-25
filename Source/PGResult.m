@@ -12,12 +12,20 @@
 
 #pragma mark - Prototypes
 
+// libpq binary format for numeric types. Always sent big-endian.
 struct numeric {
 	int16_t  count;
 	int16_t  exponent;
+#ifdef __LITTLE_ENDIAN__
+	uint16_t unknown1:6;
+	uint16_t negative:1;
+	uint16_t unknown2:9;
+#else
+	// untested
 	uint16_t unknown1:14;
 	uint16_t negative:1;
 	uint16_t unknown2:1;
+#endif
 	uint16_t scale;
 	uint16_t mantissa[];
 };
@@ -303,9 +311,8 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval)
 	memset(&accum[0], 0, sizeof(NSDecimal));
 	memset(&accum[1], 0, sizeof(NSDecimal));
 
-	uint8_t *pgbytes = (uint8_t *) pgval;
-	BOOL isNegative = (pgbytes[4] & 0x40) == 0x40;
-
+	BOOL isNegative = pgval->negative;
+	
 	int count, j, k;
 	count = NSSwapBigShortToHost(pgval->count);
 
@@ -327,39 +334,37 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval)
 	return [NSDecimalNumber decimalNumberWithDecimal:accum[j]];
 }
 
-#if 0
-/* Accessor functions for PGresult objects */
-extern ExecStatusType PQresultStatus(const PGresult *res);
-extern char *PQresStatus(ExecStatusType status);
-extern char *PQresultErrorMessage(const PGresult *res);
-extern char *PQresultErrorField(const PGresult *res, int fieldcode);
-extern int	PQntuples(const PGresult *res);
-extern int	PQnfields(const PGresult *res);
-extern int	PQbinaryTuples(const PGresult *res);
-extern char *PQfname(const PGresult *res, int field_num);
-extern int	PQfnumber(const PGresult *res, const char *field_name);
-extern Oid	PQftable(const PGresult *res, int field_num);
-extern int	PQftablecol(const PGresult *res, int field_num);
-extern int	PQfformat(const PGresult *res, int field_num);
-extern Oid	PQftype(const PGresult *res, int field_num);
-extern int	PQfsize(const PGresult *res, int field_num);
-extern int	PQfmod(const PGresult *res, int field_num);
-extern char *PQcmdStatus(PGresult *res);
-extern char *PQoidStatus(const PGresult *res);	/* old and ugly */
-extern Oid	PQoidValue(const PGresult *res);	/* new and improved */
-extern char *PQcmdTuples(PGresult *res);
-extern char *PQgetvalue(const PGresult *res, int tup_num, int field_num);
-extern int	PQgetlength(const PGresult *res, int tup_num, int field_num);
-extern int	PQgetisnull(const PGresult *res, int tup_num, int field_num);
-extern int	PQnparams(const PGresult *res);
-extern Oid	PQparamtype(const PGresult *res, int param_num);
-
-/* Describe prepared statements and portals */
-extern PGresult *PQdescribePrepared(PGconn *conn, const char *stmt);
-extern PGresult *PQdescribePortal(PGconn *conn, const char *portal);
-extern int	PQsendDescribePrepared(PGconn *conn, const char *stmt);
-extern int	PQsendDescribePortal(PGconn *conn, const char *portal);
-
-/* Delete a PGresult */
-extern void PQclear(PGresult *res);
-#endif
+///* Accessor functions for PGresult objects */
+//extern ExecStatusType PQresultStatus(const PGresult *res);
+//extern char *PQresStatus(ExecStatusType status);
+//extern char *PQresultErrorMessage(const PGresult *res);
+//extern char *PQresultErrorField(const PGresult *res, int fieldcode);
+//extern int	PQntuples(const PGresult *res);
+//extern int	PQnfields(const PGresult *res);
+//extern int	PQbinaryTuples(const PGresult *res);
+//extern char *PQfname(const PGresult *res, int field_num);
+//extern int	PQfnumber(const PGresult *res, const char *field_name);
+//extern Oid	PQftable(const PGresult *res, int field_num);
+//extern int	PQftablecol(const PGresult *res, int field_num);
+//extern int	PQfformat(const PGresult *res, int field_num);
+//extern Oid	PQftype(const PGresult *res, int field_num);
+//extern int	PQfsize(const PGresult *res, int field_num);
+//extern int	PQfmod(const PGresult *res, int field_num);
+//extern char *PQcmdStatus(PGresult *res);
+//extern char *PQoidStatus(const PGresult *res);	/* old and ugly */
+//extern Oid	PQoidValue(const PGresult *res);	/* new and improved */
+//extern char *PQcmdTuples(PGresult *res);
+//extern char *PQgetvalue(const PGresult *res, int tup_num, int field_num);
+//extern int	PQgetlength(const PGresult *res, int tup_num, int field_num);
+//extern int	PQgetisnull(const PGresult *res, int tup_num, int field_num);
+//extern int	PQnparams(const PGresult *res);
+//extern Oid	PQparamtype(const PGresult *res, int param_num);
+//
+///* Describe prepared statements and portals */
+//extern PGresult *PQdescribePrepared(PGconn *conn, const char *stmt);
+//extern PGresult *PQdescribePortal(PGconn *conn, const char *portal);
+//extern int	PQsendDescribePrepared(PGconn *conn, const char *stmt);
+//extern int	PQsendDescribePortal(PGconn *conn, const char *portal);
+//
+///* Delete a PGresult */
+//extern void PQclear(PGresult *res);
