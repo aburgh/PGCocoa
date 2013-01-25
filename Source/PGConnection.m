@@ -30,7 +30,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 
 - (BOOL)connect
 {
-	NSArray *keys = [_params allKeys];
+	NSArray *keys = _params.allKeys;
 
 	if ([keys containsObject:@"application_name"] == NO) {
 		NSString *name = [[NSProcessInfo processInfo] processName];
@@ -40,9 +40,9 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	
 	NSMutableString *connString = [NSMutableString string];
 
-	for (int i = 0; i < [keys count]; i++) {
-		NSString *key = [keys objectAtIndex:i];
-		[connString appendFormat:@"%@='%@' ", key, [_params objectForKey:key]];
+	for (int i = 0; i < keys.count; i++) {
+		NSString *key = keys[i];
+		[connString appendFormat:@"%@='%@' ", key, _params[key]];
 	}
 	
 	_connection = PQconnectdb([connString cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -65,7 +65,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 
 - (PGResult *)executeQuery:(NSString *)query
 {
-	PGresult *result = PQexec(_connection, [query UTF8String]);
+	PGresult *result = PQexec(_connection, query.UTF8String);
 
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
@@ -73,7 +73,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params
 {
 	// PGQueryParameter is used to calculate sizeof, but the actual params must be ordered differently
-	int nparams = [params count];
+	int nparams = params.count;
 	void *paramBytes = malloc(nparams * sizeof(struct PGQueryParameter));
 	
 	Oid *types		= paramBytes;
@@ -83,7 +83,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	int *formats	= (void *) lengths + (nparams * sizeof(int));
 	
 	for (int i = 0; i < nparams; i++) {
-		id param = [params objectAtIndex:i];
+		id param = params[i];
 		
 		if ([param isKindOfClass:[NSString class]]) {
 			*(types + i) = 25;	// text
@@ -138,7 +138,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 		}
 	}
 	
-	PGresult *result = PQexecParams(_connection, [query UTF8String], nparams, types, (const char * const *) valueRefs, lengths, formats, 1);
+	PGresult *result = PQexecParams(_connection, query.UTF8String, nparams, types, (const char * const *) valueRefs, lengths, formats, 1);
 
 	free(paramBytes);
 
@@ -219,7 +219,10 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	return [NSString stringWithCString:status encoding:NSUTF8StringEncoding];
 }
 
-- (PGconn *)_conn;  { return _connection; }
+- (PGconn *)_conn
+{
+	return _connection;
+}
 
 - (void)dealloc
 {

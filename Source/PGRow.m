@@ -39,10 +39,10 @@
 {
 	NSInteger index = [result indexForFieldName:key];
 	
-	if (index == -1) [super valueForKey:key];
+	if (index == -1)
+		return [super valueForKey:key];
 	
 	return [result valueAtRowIndex:rowNumber fieldIndex:index];
 }
-			
-			
+
 @end

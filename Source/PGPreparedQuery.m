@@ -3,7 +3,7 @@
 //  PGCocoa
 //
 //  Created by Aaron Burghardt on 8/30/08.
-//  Copyright 2008 No Company. All rights reserved.
+//  Copyright 2008. All rights reserved.
 //
 
 #import "PGPreparedQuery.h"
@@ -24,7 +24,7 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 		char *query;
 		PGresult *result;
 		
-		if (asprintf(&query, "DEALLOCATE %s;", [_name UTF8String]) > 0) {
+		if (asprintf(&query, "DEALLOCATE %s;", _name.UTF8String) > 0) {
 
 			result = PQexec(_conn, query);
 
@@ -65,7 +65,7 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 			
 			// PGQueryParameter is used to calculate sizeof, but the actual params are grouped as arrays of paramaters
 			_params = [paramTypes mutableCopy];
-			_nparams = [paramTypes count];
+			_nparams = paramTypes.count;
 			_paramBytes = malloc(_nparams * sizeof(struct PGQueryParameter));
 			_types = _paramBytes;
 			_values		= (void *) _types  + (_nparams * sizeof(Oid));
@@ -77,7 +77,7 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 			
 			_deallocated = NO;
 
-			PGresult *result = PQprepare(_conn, [_name UTF8String], [_query UTF8String], _nparams, _types);
+			PGresult *result = PQprepare(_conn, _name.UTF8String, _query.UTF8String, _nparams, _types);
 			if (PQresultStatus(result) != PGRES_COMMAND_OK) {
 				[self dealloc];
 				self = nil;
@@ -157,12 +157,12 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 
 - (void)bindValues:(NSArray *)values;
 {
-	NSUInteger nparams = [values count];
+	NSUInteger nparams = values.count;
 	
 	NSAssert(_nparams == nparams, @"Number of values doesn't match the number of query parameters.");
 	
 	for (int i = 0; i < _nparams; i++) 
-		[self bindValue:[values objectAtIndex:i] atIndex:i];
+		[self bindValue:values[i] atIndex:i];
 }
 
 - (PGResult *)execute;
