@@ -34,6 +34,8 @@
 - (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params;
 - (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes;
 
+- (NSString *)parameterStatus:(NSString *)paramName;
+
 - (BOOL)beginTransaction;
 - (BOOL)commitTransaction;
 - (BOOL)rollbackTransaction;
