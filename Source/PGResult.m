@@ -274,7 +274,7 @@ void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegativ
 	}
 	dcm->_length = (sizeof(mantissa) / 2);
 	dcm->_exponent = exp;
-	dcm->_isNegative = isNegative;
+	dcm->_isNegative = mantissa ? isNegative : 0;
 
 	NSDecimalCompact(dcm);
 }
