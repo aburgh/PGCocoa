@@ -268,13 +268,15 @@ void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegativ
 {
 	memset(dcm, 0, sizeof(NSDecimal));
 
+	// set before manipulating mantissa
+	dcm->_isNegative = mantissa ? isNegative : 0;
+
 	for (int i = 0; i < (sizeof(mantissa) / 2); i++) {
 		dcm->_mantissa[i] = mantissa & 0xFFFF;
 		mantissa >>= 16;
 	}
 	dcm->_length = (sizeof(mantissa) / 2);
 	dcm->_exponent = exp;
-	dcm->_isNegative = mantissa ? isNegative : 0;
 
 	NSDecimalCompact(dcm);
 }
