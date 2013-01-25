@@ -98,7 +98,8 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 {
 	id value;
 	int64_t tmp64;
-
+	int length;
+	
 	union PGresultValue {
 		uint8_t *bytes;
 		const char *string;
@@ -159,7 +160,8 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 				value = NSDecimalNumberFromBinaryNumeric(pgval.numeric);
 				break;
 			default:
-				value = [NSString stringWithCString:pgval.string encoding:NSUTF8StringEncoding];
+				length = PQgetlength(_result, rowNum, fieldNum);
+				value = [NSData dataWithBytes:pgval.bytes length:length];
 				break;
 		}
 	}
@@ -201,7 +203,6 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 	if (_result) PQclear(_result);
 	[super dealloc];
 }
-
 
 @end
 
