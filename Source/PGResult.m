@@ -9,6 +9,7 @@
 #import "PGResult.h"
 #import "PGConnection.h"
 #import "PGRow.h"
+#import <syslog.h>
 
 #pragma mark - Prototypes
 
@@ -251,17 +252,54 @@ NSString * NSStringFromPGresultStatus(ExecStatusType status)
 
 NSError * NSErrorFromPGresult(PGresult *result)
 {
+	NSError *error;
 	ExecStatusType status = PQresultStatus(result);
 
-	NSString *reason = [[[NSString alloc] initWithCString:PQresultErrorMessage(result) encoding:NSUTF8StringEncoding] autorelease];
-	
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-						  NSStringFromPGresultStatus(status), NSLocalizedDescriptionKey,
-						  reason, NSLocalizedRecoverySuggestionErrorKey,
-						  reason, NSLocalizedFailureReasonErrorKey,
-						  nil];
-	
-	return [NSError errorWithDomain:PostgreSQLErrorDomain code:status userInfo:info];
+	char *severity = PQresultErrorField(result, PG_DIAG_SEVERITY);         // always present
+	char *primary  = PQresultErrorField(result, PG_DIAG_MESSAGE_PRIMARY);  // always present
+	char *sqlstate = PQresultErrorField(result, PG_DIAG_SQLSTATE);         // always present
+	char *detail   = PQresultErrorField(result, PG_DIAG_MESSAGE_DETAIL);
+	char *hint     = PQresultErrorField(result, PG_DIAG_MESSAGE_HINT);
+
+	int level;
+	if (!strncmp(severity, "ERROR", 3))
+		level = LOG_ERR;
+	else if (!strncmp(severity, "FATAL", 3))
+		level = LOG_CRIT;
+	else if (!strncmp(severity, "PANIC", 3))
+		level = LOG_CRIT;
+	else if (!strncmp(severity, "WARNING", 3))
+		level = LOG_WARNING;
+	else if (!strncmp(severity, "NOTICE", 3))
+		level = LOG_NOTICE;
+	else if (!strncmp(severity, "DEBUG", 3))
+		level = LOG_DEBUG;
+	else if (!strncmp(severity, "INFO", 3))
+		level = LOG_INFO;
+	else if (!strncmp(severity, "LOG", 3))
+		level = LOG_DEBUG;
+	else if (status == PGRES_NONFATAL_ERROR)
+		level = LOG_WARNING;
+	else if (status == PGRES_FATAL_ERROR)
+		level = LOG_ERR;
+	else
+		level = LOG_INFO;
+
+	NSMutableDictionary *info = [NSMutableDictionary dictionary];
+
+	[info setValue:[NSString stringWithUTF8String:primary] forKey:NSLocalizedDescriptionKey];
+
+	[info setValue:[NSString stringWithFormat:@"[SQLSTATE: %s] %s", sqlstate, (detail ? detail : "")]
+			forKey:NSLocalizedFailureReasonErrorKey];
+
+	if (hint)
+		[info setValue:[NSString stringWithUTF8String:hint] forKey:NSLocalizedRecoverySuggestionErrorKey];
+
+	error = [NSError errorWithDomain:PostgreSQLErrorDomain code:status userInfo:info];
+
+	syslog(level, "%s", error.localizedDescription.UTF8String);
+
+	return error;
 }
 
 void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegative)
