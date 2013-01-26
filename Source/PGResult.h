@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #include "libpq-fe.h"
 
+@class PGRow;
 
 @interface PGResult : NSObject <NSFastEnumeration>
 {
@@ -24,6 +25,8 @@
 @property (readonly) NSError *error;
 
 - (id)_initWithResult:(PGresult *)result;
+
+- (PGRow *)rowAtIndex:(NSUInteger)index;
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum;
 - (NSUInteger)indexForFieldName:(NSString *)name;

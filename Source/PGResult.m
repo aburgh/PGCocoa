@@ -84,6 +84,11 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 	return (NSUInteger)PQntuples(_result);
 }
 
+- (PGRow *)rowAtIndex:(NSUInteger)index
+{
+	return [[[PGRow alloc] _initWithResult:self rowNumber:index] autorelease];
+}
+
 - (NSArray *)rows
 {
 	NSUInteger rowCount = self.numberOfRows;
@@ -214,6 +219,8 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 }
 
 @end
+
+#pragma mark - 
 
 NSString * NSStringFromPGresultStatus(ExecStatusType status)
 {
