@@ -266,19 +266,11 @@ NSError * NSErrorFromPGresult(PGresult *result)
 
 void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegative)
 {
-	memset(dcm, 0, sizeof(NSDecimal));
+	NSDecimalNumber *object;
 
-	// set before manipulating mantissa
-	dcm->_isNegative = mantissa ? isNegative : 0;
-
-	for (int i = 0; i < (sizeof(mantissa) / 2); i++) {
-		dcm->_mantissa[i] = mantissa & 0xFFFF;
-		mantissa >>= 16;
-	}
-	dcm->_length = (sizeof(mantissa) / 2);
-	dcm->_exponent = exp;
-
-	NSDecimalCompact(dcm);
+	object = [[NSDecimalNumber alloc] initWithMantissa:mantissa exponent:exp isNegative:isNegative];
+	*dcm = object.decimalValue;
+	[object release];
 }
 
 void SwapBigBinaryNumericToHost(struct numeric *pgdata)
