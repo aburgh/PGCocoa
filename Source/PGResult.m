@@ -316,7 +316,10 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval)
 	BOOL isNegative = pgval->negative;
 	
 	int count, j, k;
+
 	count = NSSwapBigShortToHost(pgval->count);
+	if (count > 9)
+		[NSException raise:NSDecimalNumberExactnessException format:@"Value from database exceeds 36 digits of precision"];
 
 	for (int i = 0; i < count; i++) {
 		uint16_t mantissa = NSSwapBigShortToHost(pgval->mantissa[i]);
