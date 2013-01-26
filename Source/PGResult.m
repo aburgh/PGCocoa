@@ -302,8 +302,8 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval)
 	NSDecimal accum[2], component;
 	NSCalculationError result;
 
-	memset(&accum[0], 0, sizeof(NSDecimal));
-	memset(&accum[1], 0, sizeof(NSDecimal));
+	accum[0] = [[NSDecimalNumber zero] decimalValue];
+	accum[1] = [[NSDecimalNumber zero] decimalValue];
 
 	BOOL isNegative = pgval->negative;
 	
