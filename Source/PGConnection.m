@@ -213,7 +213,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	return PQtransactionStatus(_connection);
 }
 
-- (NSString *)parameterStatus:(NSString *)paramName
+- (NSString *)valueForServerParameter:(NSString *)paramName
 {
 	const char *status = PQparameterStatus(_connection, paramName.UTF8String);
 
