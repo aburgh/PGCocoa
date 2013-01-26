@@ -10,6 +10,7 @@
 #import "PGResult.h"
 #import "PGPreparedQuery.h"
 #import "PGInternal.h"
+#import "libpq-fe.h"
 
 #pragma mark - Prototypes
 
@@ -202,12 +203,12 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	return (status == PGRES_COMMAND_OK);
 }
 
-- (ConnStatusType)status
+- (PGConnStatusType)status
 {
 	return PQstatus(_connection);
 }
 
-- (PGTransactionStatusType)transactionStatus
+- (PGTransactStatusType)transactionStatus
 {
 	return PQtransactionStatus(_connection);
 }
@@ -219,7 +220,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 	return [NSString stringWithCString:status encoding:NSUTF8StringEncoding];
 }
 
-- (PGconn *)_conn
+- (struct pg_conn *)_conn
 {
 	return _connection;
 }

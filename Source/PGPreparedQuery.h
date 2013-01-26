@@ -7,16 +7,15 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#include "libpq-fe.h"
 
 @class PGConnection;
 @class PGResult;
-
+struct pg_conn;
 
 @interface PGPreparedQuery : NSObject 
 {
 	PGConnection *_connection;
-	PGconn *_conn;				// weak ref
+	struct pg_conn *_conn;				// weak ref
 	NSString *_query;
 	NSString *_name;
 	
@@ -26,7 +25,7 @@
 	BOOL _deallocated;			// indicator for status of the prepared query 
 	
 	// The following are weak refs within _paramBytes
-	Oid *_types;
+	unsigned int *_types;		// Same type as Oid
 	double *_values;
 	const char **_valueRefs;
 	int *_lengths;

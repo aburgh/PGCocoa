@@ -12,8 +12,8 @@
 
 @interface PGRow : NSObject 
 {
-	PGResult *result;
-	NSInteger rowNumber;
+	PGResult *_result;
+	NSInteger _rowNumber;
 }
 
 @property (retain, readonly) PGResult *result;

@@ -7,23 +7,57 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#include "libpq-fe.h"
 
 @class PGResult;
 @class PGPreparedQuery;
+struct pg_conn;
 
+// Mapped directly to ConnStatusType
+typedef enum {
+	/*
+	 * Although it is okay to add to this list, values which become unused
+	 * should never be removed, nor should constants be redefined - that would
+	 * break compatibility with existing code.
+	 */
+	kPGConnectionOK,
+	kPGConnectionBad,
+	/* Non-blocking mode only below here */
+
+	/*
+	 * The existence of these should never be relied upon - they should only
+	 * be used for user feedback or similar purposes.
+	 */
+	kPGConnectionStarted,			/* Waiting for connection to be made.  */
+	kPGConnectionMade,				/* Connection OK; waiting to send.	   */
+	kPGConnectionAwaitingResponse,	/* Waiting for a response from the
+									 * postmaster.		  */
+	kPGConnectionAuthOK,			/* Received authentication; waiting for
+									 * backend startup. */
+	kPGConnectionSetEnv,			/* Negotiating environment. */
+	kPGConnectionSSL,				/* Negotiating SSL. */
+	kPGConnectionDisconnected		/* Internal state: connect() needed */
+} PGConnStatusType;
+
+// Mapped directly to PGTransactionStatusType
+typedef enum {
+	kPGTransactionIdle,				/* connection idle */
+	kPGTransactionActive,			/* command in progress */
+	kPGTransactionInTransaction,	/* idle, within transaction block */
+	kPGTransactionInError,			/* idle, within failed transaction */
+	kPGTransactionUnknown			/* cannot determine status */
+} PGTransactStatusType;
 
 @interface PGConnection : NSObject 
 {
-	PGconn *_connection;
+	struct pg_conn *_connection;
 
 	NSDictionary *_params;
 }
 
 @property (readonly) NSString *errorMessage;
 @property (readonly) NSError  *error;
-@property (readonly) ConnStatusType status;
-@property (readonly) PGTransactionStatusType transactionStatus;
+@property (readonly) PGConnStatusType status;
+@property (readonly) PGTransactStatusType transactionStatus;
 
 - (id)initWithParameters:(NSDictionary *)params;
 
@@ -40,7 +74,7 @@
 - (BOOL)commitTransaction;
 - (BOOL)rollbackTransaction;
 
-- (PGconn *)_conn;
+- (struct pg_conn *)_conn;
 
 @end
 

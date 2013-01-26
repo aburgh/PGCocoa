@@ -10,8 +10,10 @@
 #import "PGConnection.h"
 #import "PGResult.h"
 #import "PGInternal.h"
+#import "libpq-fe.h"
 
 #pragma mark - Prototypes
+
 NSInteger PGSecondsFromUTC(PGConnection *connection);
 
 #pragma mark -

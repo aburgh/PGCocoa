@@ -9,7 +9,7 @@
 
 // Private method of PGConnection
 @interface PGConnection (PGConnectionPGPreparedQuery)
-- (PGconn *)_conn;
+- (struct pg_conn *)_conn;
 @end
 
 @interface PGPreparedQuery (PGPreparedQueryPGConnectionPrivate)
@@ -20,10 +20,10 @@ union PGMaxSizeType {
 	long long	ll;
 	double		d;
 	int			i;
-	Oid			oid;
+	unsigned int oid;	// Same as Oid
 };
 struct PGQueryParameter {
-	Oid					type;
+	unsigned int		type;		// Same as Oid
 	union PGMaxSizeType	value;
 	char *				valueRef;
 	int *				length;

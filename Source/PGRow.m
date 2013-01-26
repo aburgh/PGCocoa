@@ -18,31 +18,31 @@
 - (id)_initWithResult:(PGResult *)parent rowNumber:(NSInteger)index
 {
 	if (self = [super init]) {
-		result = [parent retain];
-		rowNumber = index;
+		_result = [parent retain];
+		_rowNumber = index;
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	[result release];
+	[_result release];
 	[super dealloc];
 }
 
 - (id)valueAtFieldIndex:(NSInteger)index
 {
-	return [result valueAtRowIndex:rowNumber fieldIndex:index];
+	return [_result valueAtRowIndex:rowNumber fieldIndex:index];
 }
 
 - (id)valueForKey:(NSString *)key
 {
-	NSInteger index = [result indexForFieldName:key];
+	NSInteger index = [_result indexForFieldName:key];
 	
 	if (index == -1)
 		return [super valueForKey:key];
 	
-	return [result valueAtRowIndex:rowNumber fieldIndex:index];
+	return [_result valueAtRowIndex:rowNumber fieldIndex:index];
 }
 
 @end

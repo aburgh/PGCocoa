@@ -9,6 +9,7 @@
 #import "PGResult.h"
 #import "PGConnection.h"
 #import "PGRow.h"
+#import "libpq-fe.h"
 #import <syslog.h>
 
 #pragma mark - Prototypes
@@ -34,6 +35,8 @@ struct numeric {
 void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegative);
 void SwapBigBinaryNumericToHost(struct numeric *pgdata);
 NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
+NSString * NSStringFromPGresultStatus(ExecStatusType status);
+NSError * NSErrorFromPGresult(PGresult *result);
 
 #pragma mark -
 
@@ -184,7 +187,7 @@ NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
 	return value;
 }
 
-- (ExecStatusType)status
+- (PGExecStatusType)status
 {
 	return PQresultStatus(_result);
 }
