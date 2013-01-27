@@ -10,15 +10,15 @@
 #import <PGCocoa/PGConnection.h>
 #import <PGCocoa/PGResult.h>
 #import <PGCocoa/PGPreparedQuery.h>
-
+#import <syslog.h>
 
 void simpleTest(PGConnection *conn)
 {
 	//	PGResult *result = [conn executeQuery:@"select * from pg_tablespace;"];
 	PGResult *result = [conn executeQuery:@"select * from abperson"];
 	
-	printf("Number of rows: %i\n", [result numberOfRows]);
-	printf("Number of cols: %i\n", [result numberOfFields]);
+	printf("Number of rows: %li\n", [result numberOfRows]);
+	printf("Number of cols: %li\n", [result numberOfFields]);
 	
 	for (int i = 0; i < [result numberOfRows]; i++) {
 		for (int j = 0; j < [result numberOfFields]; j++) {
@@ -58,32 +58,50 @@ void test4(PGConnection *conn)
 
 void test5(PGConnection *conn)
 {
-	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	NSArray *params = @[NSDate.date, NSDate.date, [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
+
 //	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithInt:1], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+
 	PGPreparedQuery *query = [conn preparedQueryWithName:@"mytest"
 												   query:@"insert into testnums values ($1, $2, $3, $4, $5);" 
 												   types:params];
-	
-	[conn beginTransaction];
+
+	if (!query) {
+		syslog(LOG_DEBUG, "%s: error preparing query: %s", __func__, conn.errorMessage.UTF8String);
+		return;
+	}
+
+	if ([conn beginTransaction] == NO) {
+		syslog(LOG_DEBUG, "%s: begin transaction: %s", __func__, conn.errorMessage.UTF8String);
+		[query deallocate];
+		return;
+	};
 	
 	[query bindValues:params];
 	PGResult *result = [query execute];
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+	printf("Result: %s\n", result.error.description.UTF8String);
 	
 	[query bindValue:[NSDate date] atIndex:1];
 	[query bindValue:[NSNumber numberWithDouble:0.0] atIndex:3];
 	result = [query execute];
-	
-	[query bindValue:[NSDate date] atIndex:1];
-	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
-	result = [query execute];
+	sleep(1);
 
 	[query bindValue:[NSDate date] atIndex:1];
 	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
 	result = [query execute];
-	[conn commitTransaction];
-	
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+	sleep(2);
+
+	[query bindValue:[NSDate date] atIndex:1];
+	[query bindValue:[NSNumber numberWithDouble:2.0] atIndex:3];
+	result = [query execute];
+
+	if ([conn commitTransaction] == NO) {
+		syslog(LOG_DEBUG, "commit transaction: %s", conn.errorMessage.UTF8String);
+		[query deallocate];
+		return;
+	};
+
+	printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test6(PGConnection *conn)
@@ -109,12 +127,17 @@ void test7(PGConnection *conn)
 
 int main(int argc, char *argv[]) 
 {
+	openlog("pgtest",  LOG_PERROR | LOG_CONS, LOG_USER);
+	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:@"test", PGConnectionParameterDatabaseNameKey, nil];
 	PGConnection *conn = [[PGConnection alloc] initWithParameters:params];
 	
-	if (![conn connect]) goto bail;
+	if (![conn connect]) {
+		syslog(LOG_ERR, "connect: %s", conn.errorMessage.UTF8String);
+		goto bail;
+	}
 
 //	simpleTest(conn);
 //	test1(conn);
