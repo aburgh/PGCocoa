@@ -32,6 +32,7 @@
 		96DAFDD50E2B50D800406253 /* PGConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 96DAFDD30E2B50D800406253 /* PGConnection.m */; };
 		96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163AD0E94F64E000AEA9A /* libpq-fe.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */ = {isa = PBXBuildFile; fileRef = 96E163ED0E951406000AEA9A /* postgres_ext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E9A8A916B79AD600071519 /* PGInternal.m */; };
 		96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 96EAFC8D1061C69C00DB0100 /* PGRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96EAFC901061C69C00DB0100 /* PGRow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EAFC8E1061C69C00DB0100 /* PGRow.m */; };
 /* End PBXBuildFile section */
@@ -97,6 +98,7 @@
 		96DAFDD30E2B50D800406253 /* PGConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGConnection.m; sourceTree = "<group>"; };
 		96E163AD0E94F64E000AEA9A /* libpq-fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "libpq-fe.h"; path = "usr/include/libpq-fe.h"; sourceTree = SDKROOT; };
 		96E163ED0E951406000AEA9A /* postgres_ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = postgres_ext.h; path = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/include/postgres_ext.h; sourceTree = "<absolute>"; };
+		96E9A8A916B79AD600071519 /* PGInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInternal.m; sourceTree = "<group>"; };
 		96EAFC8D1061C69C00DB0100 /* PGRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRow.h; sourceTree = "<group>"; };
 		96EAFC8E1061C69C00DB0100 /* PGRow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRow.m; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -235,6 +237,7 @@
 			children = (
 				96976C490E6988A500325EE2 /* PGCocoa.h */,
 				96976C440E69864700325EE2 /* PGInternal.h */,
+				96E9A8A916B79AD600071519 /* PGInternal.m */,
 				32DBCF5E0370ADEE00C91783 /* PGCocoa_Prefix.pch */,
 				9610C0890E22450D000E25B2 /* flash_image_importer.h */,
 				9610C08A0E22450D000E25B2 /* flash_image_importer.c */,
@@ -451,6 +454,7 @@
 				96A56A4D0E526E14005D0556 /* PGError.m in Sources */,
 				96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */,
 				96EAFC901061C69C00DB0100 /* PGRow.m in Sources */,
+				96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

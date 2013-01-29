@@ -9,32 +9,15 @@
 #import "PGResult.h"
 #import "PGConnection.h"
 #import "PGRow.h"
-#import "libpq-fe.h"
+#import "PGInternal.h"
 #import <syslog.h>
 
 #pragma mark - Prototypes
 
-// libpq binary format for numeric types. Always sent big-endian.
-struct numeric {
-	int16_t  count;
-	int16_t  exponent;
-#ifdef __LITTLE_ENDIAN__
-	uint16_t unknown1:6;
-	uint16_t negative:1;
-	uint16_t unknown2:9;
-#else
-	// untested
-	uint16_t unknown1:14;
-	uint16_t negative:1;
-	uint16_t unknown2:1;
-#endif
-	uint16_t scale;
-	uint16_t mantissa[];
-};
 
 void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegative);
-void SwapBigBinaryNumericToHost(struct numeric *pgdata);
-NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval);
+void SwapBigBinaryNumericToHost(pg_numeric_t *pgdata);
+NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(pg_numeric_t *pgval);
 NSString * NSStringFromPGresultStatus(ExecStatusType status);
 NSError * NSErrorFromPGresult(PGresult *result);
 
@@ -114,75 +97,25 @@ NSError * NSErrorFromPGresult(PGresult *result);
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum
 {
 	id value;
-	int64_t tmp64;
+	char *pgval;
 	int length;
-	
-	union PGresultValue {
-		uint8_t *bytes;
-		const char *string;
-		int16_t *val16;
-		int32_t *val32;
-		int64_t *val64;
-		struct numeric *numeric;
-	} pgval;
+	Oid oid;
+	BOOL isBinary;
 
-	if (PQgetisnull(_result, rowNum, fieldNum)) return [NSNull null];
+	if (PQgetisnull(_result, rowNum, fieldNum))
+		return [NSNull null];
 	
-	BOOL isBinary = PQfformat(_result, fieldNum);
-	pgval.string = PQgetvalue(_result, rowNum, fieldNum);
-	
+	pgval = PQgetvalue(_result, rowNum, fieldNum);
+	isBinary = PQfformat(_result, fieldNum);
+
 	if (isBinary) {
-		// get Oid types with "SELECT oid, typname from pg_type;
-		Oid oid = PQftype(_result, fieldNum);
-		switch (oid) {
-			case 16: // bool
-				value = [NSNumber numberWithBool:(pgval.bytes[0] == 't')  ?  YES : NO];
-				break;
-			case 17:  // bytea
-				value = [NSData dataWithBytes:pgval.bytes
-									   length:PQgetlength(_result, rowNum, fieldNum)];
-				break;
-			case 18:  // char
-				value = [NSNumber numberWithChar:pgval.bytes[0]];
-				break;
-			case 21:  // int2
-				value = [NSNumber numberWithShort:NSSwapBigShortToHost(*pgval.val16)];
-				break;
-			case 23:  // int4
-				value = [NSNumber numberWithInt:NSSwapBigIntToHost(*pgval.val32)];
-				break;
-			case 20:  // int8
-				value = [NSNumber numberWithLongLong:NSSwapBigLongLongToHost(*pgval.val64)];
-				break;
-			case 700:  // float4
-				value = [NSNumber numberWithFloat:NSSwapBigIntToHost(*pgval.val32)];
-				break;
-			case 701: {} // float8
-				value = [NSNumber numberWithDouble:NSSwapBigLongLongToHost(*pgval.val64)];
-				break;
-			case 1114:  // timestamp
-			case 1184:  // timestamptz
-				// The default storage for timestamps in PostgreSQL 8.4 is int64 in microseconds. Prior to
-				// 8.4, the default was a double, and is still a compile-time option. Supporting floats
-				// is an exercise for the reader. Hint: the integer_datetimes connection parameter reflects
-				// the server's setting.
-
-				tmp64 = NSSwapBigLongLongToHost(*pgval.val64);
-				NSTimeInterval interval = (NSTimeInterval) (tmp64 / 1000000);
-				interval -= 31622400.0;												// adjust for Postgres' reference date of 1/1/2000
-				interval += ((NSTimeInterval) (tmp64 % 1000000)) / 1000000 ;
-				value = [NSDate dateWithTimeIntervalSinceReferenceDate:interval];
-				break;
-			case 1700: {} // numeric
-				value = NSDecimalNumberFromBinaryNumeric(pgval.numeric);
-				break;
-			default:
-				length = PQgetlength(_result, rowNum, fieldNum);
-				value = [NSData dataWithBytes:pgval.bytes length:length];
-				break;
-		}
+		// get Oid types with "SELECT oid, typname from pg_type;"
+		length = PQgetlength(_result, rowNum, fieldNum);
+		oid = PQftype(_result, fieldNum);
+		value = NSObjectFromPGBinaryValue(pgval, length, oid);
 	}
-	else value = [NSString stringWithCString:pgval.string encoding:NSUTF8StringEncoding];
+	else
+		value = [NSString stringWithCString:pgval encoding:NSUTF8StringEncoding];
 	
 	return value;
 }
@@ -272,7 +205,9 @@ NSError * NSErrorFromPGresult(PGresult *result)
 	char *hint     = PQresultErrorField(result, PG_DIAG_MESSAGE_HINT);
 
 	int level;
-	if (!strncmp(severity, "ERROR", 3))
+	if (!severity)
+		level = LOG_INFO;
+	else if (!strncmp(severity, "ERROR", 3))
 		level = LOG_ERR;
 	else if (!strncmp(severity, "FATAL", 3))
 		level = LOG_CRIT;
@@ -297,8 +232,12 @@ NSError * NSErrorFromPGresult(PGresult *result)
 
 	NSMutableDictionary *info = [NSMutableDictionary dictionary];
 
-	[info setValue:[NSString stringWithUTF8String:primary] forKey:NSLocalizedDescriptionKey];
+	if (primary)
+		[info setValue:[NSString stringWithUTF8String:primary] forKey:NSLocalizedDescriptionKey];
+	else
+		[info setValue:NSStringFromPGresultStatus(status) forKey:NSLocalizedDescriptionKey];
 
+	if (sqlstate && detail)
 	[info setValue:[NSString stringWithFormat:@"[SQLSTATE: %s] %s", sqlstate, (detail ? detail : "")]
 			forKey:NSLocalizedFailureReasonErrorKey];
 
@@ -310,73 +249,6 @@ NSError * NSErrorFromPGresult(PGresult *result)
 	syslog(level, "%s", error.localizedDescription.UTF8String);
 
 	return error;
-}
-
-void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegative)
-{
-	NSDecimalNumber *object;
-
-	object = [[NSDecimalNumber alloc] initWithMantissa:mantissa exponent:exp isNegative:isNegative];
-	*dcm = object.decimalValue;
-	[object release];
-}
-
-void SwapBigBinaryNumericToHost(struct numeric *pgdata)
-{
-	struct {
-		int16_t  count;
-		int16_t  exponent;
-//		uint16_t unknown1:14;
-//		uint16_t negative:1;
-//		uint16_t unknown2:1;
-		uint16_t flags;
-		uint16_t scale;
-		uint16_t mantissa[];
-	} * swap;
-
-	swap = (void *)pgdata;
-
-	swap->count = NSSwapBigShortToHost(swap->count);
-	swap->exponent = NSSwapBigShortToHost(swap->exponent);
-	swap->flags = NSSwapBigShortToHost(swap->flags);
-	swap->scale = NSSwapBigShortToHost(swap->scale);
-
-	for (int i = 0; i < swap->count; i++)
-		swap->mantissa[i] = NSSwapBigShortToHost(swap->mantissa[i]);
-}
-
-NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(struct numeric *pgval)
-{
-	NSDecimal accum[2], component;
-	NSCalculationError result;
-
-	accum[0] = [[NSDecimalNumber zero] decimalValue];
-	accum[1] = [[NSDecimalNumber zero] decimalValue];
-
-	BOOL isNegative = pgval->negative;
-	
-	int count, j, k;
-
-	count = NSSwapBigShortToHost(pgval->count);
-	if (count > 9)
-		[NSException raise:NSDecimalNumberExactnessException format:@"Value from database exceeds 36 digits of precision"];
-
-	for (int i = 0; i < count; i++) {
-		uint16_t mantissa = NSSwapBigShortToHost(pgval->mantissa[i]);
-		uint16_t exponent = NSSwapBigShortToHost(pgval->exponent);
-
-		NSDecimalInit(&component, mantissa, (exponent - i) << 2, isNegative);
-
-		// alternate between accum decimals to avoid copying the result
-		j = i & 0x1;
-		k = (i + 1) & 0x1;
-
-		result = NSDecimalAdd(&accum[j], &accum[k], &component, NSRoundPlain);
-		if (result != NSCalculationNoError) {
-			return [NSDecimalNumber notANumber];
-		}
-	}
-	return [NSDecimalNumber decimalNumberWithDecimal:accum[j]];
 }
 
 ///* Accessor functions for PGresult objects */

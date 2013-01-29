@@ -74,7 +74,7 @@ typedef enum {
 - (BOOL)commitTransaction;
 - (BOOL)rollbackTransaction;
 
-- (struct pg_conn *)_conn;
+- (struct pg_conn *)conn;
 
 @end
 

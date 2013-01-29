@@ -10,23 +10,19 @@
 
 @class PGConnection;
 @class PGResult;
-struct pg_conn;
+union pg_value;
 
 @interface PGPreparedQuery : NSObject 
 {
 	PGConnection *_connection;
-	struct pg_conn *_conn;				// weak ref
 	NSString *_query;
 	NSString *_name;
 	
 	NSMutableArray *_params;
-	int _nparams;
-	void *_paramBytes;
-	BOOL _deallocated;			// indicator for status of the prepared query 
+	BOOL _deallocated;			// indicator for status of the prepared query
 	
-	// The following are weak refs within _paramBytes
 	unsigned int *_types;		// Same type as Oid
-	double *_values;
+	union pg_value *_values;
 	const char **_valueRefs;
 	int *_lengths;
 	int *_formats;

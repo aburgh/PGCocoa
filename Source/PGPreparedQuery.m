@@ -10,7 +10,7 @@
 #import "PGConnection.h"
 #import "PGResult.h"
 #import "PGInternal.h"
-#import "libpq-fe.h"
+#import <syslog.h>
 
 #pragma mark - Prototypes
 
@@ -28,12 +28,12 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 		
 		if (asprintf(&query, "DEALLOCATE %s;", _name.UTF8String) > 0) {
 
-			result = PQexec(_conn, query);
+			result = PQexec(_connection.conn, query);
 
 			if (PQresultStatus(result) == PGRES_COMMAND_OK) 
 				_deallocated = YES;
 			else
-				fprintf(stderr, "Error deallocating prepared query: %s\n", PQresultErrorMessage(result));
+				syslog(LOG_ERR, "DEALLOCATE %s: %s", _name.UTF8String, PQresultErrorMessage(result));
 
 			free(query);
 			
@@ -51,7 +51,12 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 	[_name release];
 	[_query release];
 	[_connection release];	
-	if (_paramBytes) free(_paramBytes);
+
+	free(_types);
+	free(_values);
+	free(_valueRefs);
+	free(_lengths);
+	free(_formats);
 	[super dealloc];
 }
 
@@ -60,26 +65,22 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 	if (self = [super init]) {
 		@try {
 			_connection = [conn retain];
-			_conn = [_connection _conn];
-			
 			_query = [query copy];
 			_name = [name copy];
 			
 			// PGQueryParameter is used to calculate sizeof, but the actual params are grouped as arrays of paramaters
 			_params = [paramTypes mutableCopy];
-			_nparams = paramTypes.count;
-			_paramBytes = malloc(_nparams * sizeof(struct PGQueryParameter));
-			_types = _paramBytes;
-			_values		= (void *) _types  + (_nparams * sizeof(Oid));
-			_valueRefs	= (void *) _values + (_nparams * sizeof(union PGMaxSizeType));
-			_lengths	= (void *) _valueRefs + (_nparams * sizeof(char *));
-			_formats	= (void *) _lengths + (_nparams * sizeof(int));
-			
+			_types     = calloc(_params.count, sizeof(Oid));
+			_values    = calloc(_params.count, sizeof(pg_value_t));
+			_valueRefs = calloc(_params.count, sizeof(char *));
+			_lengths   = calloc(_params.count, sizeof(int));
+			_formats   = calloc(_params.count, sizeof(int));
+
 			[self bindValues:paramTypes];
 			
 			_deallocated = NO;
 
-			PGresult *result = PQprepare(_conn, _name.UTF8String, _query.UTF8String, _nparams, _types);
+			PGresult *result = PQprepare(_connection.conn, _name.UTF8String, _query.UTF8String, _params.count, _types);
 			if (PQresultStatus(result) != PGRES_COMMAND_OK) {
 				[self dealloc];
 				self = nil;
@@ -93,66 +94,74 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 	return self;
 }
 
-- (void)bindValue:(id)value atIndex:(NSUInteger)paramIndex;
+- (void)bindValue:(id)value atIndex:(NSUInteger)i;
 {
-	int i = paramIndex;
 	[_params replaceObjectAtIndex:i withObject:value];
+
+	// The default storage for timestamps in PostgreSQL 8.4 is int64 in microseconds. Prior to
+	// 8.4, the default was a double, and is still a compile-time option. Supporting floats
+	// is an exercise for the reader. Hint: the integer_datetimes connection parameter reflects
+	// the server's setting.
+
+	// Prefer isKindOfClass: over isMemberOfClass: to allow class clusters,
+	// but check subclasses first (i.e., NSDecimalNumber before NSNumber).
 	
 	if ([value isKindOfClass:NSString.class]) {
-		*(_types + i) = 25;	// text
-		*(_valueRefs + i) = (char *)[value UTF8String];
-		*(_lengths + i) = 0;  // ignored
-		*(_formats + i) = 0; 
+		_types[i] = 25;	// text
+		_valueRefs[i] = (char *)[value UTF8String];
+		_lengths[i] = 0;  // ignored
+		_formats[i] = 0; 
 	}
 	else if ([value isKindOfClass:NSDate.class]) {
-		// TODO
-		*(_types + i) = 1184; // timestamp == 1114,  timestamptz == 1184
-		NSTimeInterval interval = [value timeIntervalSinceReferenceDate] + 31622400.0; // timestamp(tz) ref date == 2000-01-01 midnight
-		*(long long *)(_values + i) = NSSwapHostLongLongToBig(*(long long *)&interval);  // cast needed to prevent converting swap result to a double
-		*(_valueRefs + i) = (char *)(_values + i);
-		*(_lengths + i) = 8;
-		*(_formats + i) = 1;
+		_types[i] = 1184; // timestamp == 1114, timestamptz == 1184
+
+		long double interval = [value timeIntervalSinceReferenceDate]; // upcast to preserve precision
+		interval += 31622400.0; // timestamp(tz) ref date == 2000-01-01 midnight
+		interval *= 1000000.0;
+		_values[i].val64 = interval;
+		_values[i].val64 = NSSwapHostLongLongToBig(_values[i].val64);
+		_valueRefs[i] = _values[i].bytes;
+		_lengths[i] = 8;
+		_formats[i] = 1;
 	}
 	else if ([value isKindOfClass:NSData.class]) {
-		*(_types + i) = 17;  // bytea
-		*(_valueRefs + i) = (char *)[value bytes];
-		*(_lengths + i) = (int)[value length];
-		*(_formats + i) = 1;
+		_types[i] = 17;  // bytea
+		_valueRefs[i] = (char *)[value bytes];
+		_lengths[i] = (int)[value length];
+		_formats[i] = 1;
 	}
 	else if ([value isKindOfClass:NSNumber.class]) {
 		
 		const char *objCType = [value objCType];
-		switch (*objCType) {
+		switch (objCType[0]) {
 			case 'c':
 			case 's':
 			case 'i':
 			case 'q':
-				*(_types + i) = 20; // int8
-				long long tmpLongLong = [value longLongValue];
-				*(long long *)(_values + i) = NSSwapHostLongLongToBig(tmpLongLong); // cast needed to prevent converting swap result to a double
-				*(_lengths + i) = sizeof(long long);
+				_types[i] = 20; // int8
+				_values[i].val64 = NSSwapHostLongLongToBig([value longLongValue]);
+				_lengths[i] = 8;
 				break;
 			case 'f':
 			case 'd':
-				*(_types + i) = 701; // float4 = 700, float8 == 701
-				double tmpDouble = [value doubleValue];
-				*(long long *)(_values + i) = NSSwapHostLongLongToBig(*(long long *)&tmpDouble); // cast needed to prevent converting swap result to a double
-				*(_lengths + i) = sizeof(double);
+				_types[i] = 701; // float4 = 700, float8 == 701
+				// store as double but swap as long long to prevent converting swap result to a double
+				_values[i].d = [value doubleValue];
+				_values[i].val64 = NSSwapHostLongLongToBig(_values[i].val64);
+				_lengths[i] = sizeof(double);
 				break;
-			default: 
-				@throw([NSException exceptionWithName:NSInvalidArgumentException
-											   reason:@"Unsupported NSNumber objCType" 
-											 userInfo:nil]);
+			default:
+				[NSException raise:NSInvalidArgumentException format:@"Unsupported NSNumber objCType"];
 				break;
 		}
 		
-		*(_valueRefs + i) = (char *)(_values + i);
-		*(_formats + i) = 1;
+		_valueRefs[i] = _values[i].bytes;
+		_formats[i] = 1;
 	}
 	else if (value == NSNull.null) {
-		*(_valueRefs + i) = NULL;
-		*(_lengths + i) = 0;  // ignored
-		*(_formats + i) = 0; 
+		_valueRefs[i] = NULL;
+		_lengths[i] = 0;  // ignored
+		_formats[i] = 0;
 	}
 	
 }
@@ -161,15 +170,15 @@ NSInteger PGSecondsFromUTC(PGConnection *connection);
 {
 	NSUInteger nparams = values.count;
 	
-	NSAssert(_nparams == nparams, @"Number of values doesn't match the number of query parameters.");
+	NSAssert(_params.count == nparams, @"Number of values doesn't match the number of query parameters.");
 	
-	for (int i = 0; i < _nparams; i++) 
+	for (int i = 0; i < _params.count; i++)
 		[self bindValue:values[i] atIndex:i];
 }
 
 - (PGResult *)execute;
 {
-	PGresult *result = PQexecPrepared(_conn, _name.UTF8String, _nparams, _valueRefs, _lengths, _formats, 1);
+	PGresult *result = PQexecPrepared(_connection.conn, _name.UTF8String, _params.count, _valueRefs, _lengths, _formats, 1);
 
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }
