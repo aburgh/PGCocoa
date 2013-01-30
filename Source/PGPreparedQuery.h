@@ -7,10 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "PGQueryParameters.h"
 
 @class PGConnection;
 @class PGResult;
-union pg_value;
 
 @interface PGPreparedQuery : NSObject 
 {
@@ -18,21 +18,20 @@ union pg_value;
 	NSString *_query;
 	NSString *_name;
 	
-	NSMutableArray *_params;
+//	NSMutableArray *_params;
 	BOOL _deallocated;			// indicator for status of the prepared query
 	
-	unsigned int *_types;		// Same type as Oid
-	union pg_value *_values;
-	const char **_valueRefs;
-	int *_lengths;
-	int *_formats;
 }
 
-- (void)bindValue:(id)value atIndex:(NSUInteger)paramIndex;
++ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes connection:(PGConnection *)conn;
 
-- (void)bindValues:(NSArray *)values;
++ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn;
 
-- (PGResult *)execute;
+- (id)initWithName:(NSString *)name query:(NSString *)query types:(NSArray *)sampleParams connection:(PGConnection *)conn;
+
+- (id)initWithName:(NSString *)name query:(NSString *)query types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn;
+
+- (PGResult *)executeWithParameters:(PGQueryParameters *)params;
 
 - (void)deallocate;
 

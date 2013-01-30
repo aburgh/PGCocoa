@@ -10,6 +10,7 @@
 
 @class PGResult;
 @class PGPreparedQuery;
+@class PGQueryParameters;
 struct pg_conn;
 
 // Mapped directly to ConnStatusType
@@ -65,8 +66,7 @@ typedef enum {
 - (void)disconnect;
 
 - (PGResult *)executeQuery:(NSString *)query;
-- (PGResult *)executeQuery:(NSString *)query parameters:(NSArray *)params;
-- (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes;
+- (PGResult *)executeQuery:(NSString *)query parameters:(PGQueryParameters *)params;
 
 - (NSString *)valueForServerParameter:(NSString *)paramName;
 

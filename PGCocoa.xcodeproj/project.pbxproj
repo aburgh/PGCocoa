@@ -35,6 +35,9 @@
 		96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E9A8A916B79AD600071519 /* PGInternal.m */; };
 		96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 96EAFC8D1061C69C00DB0100 /* PGRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96EAFC901061C69C00DB0100 /* PGRow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EAFC8E1061C69C00DB0100 /* PGRow.m */; };
+		96F9324D16B7BA7C007D6207 /* PGQueryParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */; };
+		96F9324E16B7BA7C007D6207 /* PGQueryParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F9324C16B7BA7C007D6207 /* PGQueryParameters.m */; };
+		96F9325216B94539007D6207 /* libpq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96F9325116B94539007D6207 /* libpq.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +104,10 @@
 		96E9A8A916B79AD600071519 /* PGInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInternal.m; sourceTree = "<group>"; };
 		96EAFC8D1061C69C00DB0100 /* PGRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRow.h; sourceTree = "<group>"; };
 		96EAFC8E1061C69C00DB0100 /* PGRow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRow.m; sourceTree = "<group>"; };
+		96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGQueryParameters.h; sourceTree = "<group>"; };
+		96F9324C16B7BA7C007D6207 /* PGQueryParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGQueryParameters.m; sourceTree = "<group>"; };
+		96F9324F16B7C314007D6207 /* PGQueryParameters_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PGQueryParameters_Private.h; sourceTree = "<group>"; };
+		96F9325116B94539007D6207 /* libpq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpq.dylib; path = /usr/lib/libpq.dylib; sourceTree = "<absolute>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
@@ -109,6 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96F9325216B94539007D6207 /* libpq.dylib in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -209,6 +217,9 @@
 				96A56A4B0E526E14005D0556 /* PGError.m */,
 				96EAFC8D1061C69C00DB0100 /* PGRow.h */,
 				96EAFC8E1061C69C00DB0100 /* PGRow.m */,
+				96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */,
+				96F9324C16B7BA7C007D6207 /* PGQueryParameters.m */,
+				96F9324F16B7C314007D6207 /* PGQueryParameters_Private.h */,
 			);
 			name = Classes;
 			path = Source;
@@ -218,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
+				96F9325116B94539007D6207 /* libpq.dylib */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -277,6 +289,7 @@
 				96E163AE0E94F64E000AEA9A /* libpq-fe.h in Headers */,
 				96E163EE0E951406000AEA9A /* postgres_ext.h in Headers */,
 				96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */,
+				96F9324D16B7BA7C007D6207 /* PGQueryParameters.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +468,7 @@
 				96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */,
 				96EAFC901061C69C00DB0100 /* PGRow.m in Sources */,
 				96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */,
+				96F9324E16B7BA7C007D6207 /* PGQueryParameters.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,15 +540,11 @@
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
 				INFOPLIST_FILE = Resources/Info.plist;
@@ -547,13 +557,11 @@
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
 				INFOPLIST_FILE = Resources/Info.plist;
@@ -567,16 +575,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_OBJC_GC = supported;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-lpq";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -584,14 +583,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_OBJC_GC = supported;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_LDFLAGS = "-lpq";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -725,19 +716,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
 				PRODUCT_NAME = pgtest;
 			};
 			name = Debug;
@@ -746,20 +725,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
 				PRODUCT_NAME = pgtest;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};

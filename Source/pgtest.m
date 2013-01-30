@@ -29,42 +29,58 @@ void simpleTest(PGConnection *conn)
 
 void test1(PGConnection *conn)
 {
-	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
+	NSArray *values = @[[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
+	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
+
 	PGResult *result = [conn executeQuery:@"insert into testnums values ($1, $2, $3, $4, $5);" parameters:params];
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+
+	if (result.status != kPGResultTuplesOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test2(PGConnection *conn)
 {
-	NSArray *params = [NSArray arrayWithObjects:[NSNumber numberWithInt:4], @"Veryl", @"Burghardt", nil];
+	NSArray *values = @[[NSNumber numberWithInt:4], @"Veryl", @"Burghardt"];
+	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
+
 	PGResult *result = [conn executeQuery:@"insert into abperson(rowid, first, last) values( $1, $2, $3);" parameters:params];
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test3(PGConnection *conn)
 {
-	NSArray *params = [NSArray arrayWithObjects:[NSNumber numberWithDouble:10023445.98373], nil];
+	NSArray *values = @[[NSNumber numberWithDouble:10023445.98373]];
+	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
+
 	PGResult *result = [conn executeQuery:@"insert into testnums (f2) values ($1);" parameters:params];
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test4(PGConnection *conn)
 {
-	NSArray *params = [NSArray arrayWithObjects:[@"Some sample data" dataUsingEncoding:NSUTF8StringEncoding], nil];
-//	NSArray *params = [NSArray arrayWithObjects:[NSData data], nil];
+	NSArray *values = @[[@"Some sample data" dataUsingEncoding:NSUTF8StringEncoding]];
+	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
+
 	PGResult *result = [conn executeQuery:@"insert into testnums (data) values ($1);" parameters:params];
-	printf("Result: %s\n", [[[result error] description] UTF8String]);
+
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test5(PGConnection *conn)
 {
-	NSArray *params = @[NSDate.date, NSDate.date, [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
+	PGQueryParameterType types[] = { kPGQryParamTimestampTZ, kPGQryParamTimestampTZ, kPGQryParamFloat, kPGQryParamDouble, kPGQryParamData };
 
-//	NSArray *params = [NSArray arrayWithObjects:[NSDate date], [NSDate date], [NSNumber numberWithFloat:98.62], [NSNumber numberWithInt:1], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding], nil];
-
-	PGPreparedQuery *query = [conn preparedQueryWithName:@"mytest"
-												   query:@"insert into testnums values ($1, $2, $3, $4, $5);" 
-												   types:params];
+	PGPreparedQuery *query;
+	query = [PGPreparedQuery preparedQueryWithName:@"test5"
+											 query:@"insert into testnums values ($1, $2, $3, $4, $5);"
+											 types:types
+											 count:5
+										connection:conn];
 
 	if (!query) {
 		syslog(LOG_DEBUG, "%s: error preparing query: %s", __func__, conn.errorMessage.UTF8String);
@@ -76,24 +92,36 @@ void test5(PGConnection *conn)
 		[query deallocate];
 		return;
 	};
+
+	// execute query
+
+	NSArray *values = @[NSDate.date, NSDate.date, [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
+
+	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
+
+	PGResult *result = [query executeWithParameters:params];
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 	
-	[query bindValues:params];
-	PGResult *result = [query execute];
-	printf("Result: %s\n", result.error.description.UTF8String);
-	
-	[query bindValue:[NSDate date] atIndex:1];
-	[query bindValue:[NSNumber numberWithDouble:0.0] atIndex:3];
-	result = [query execute];
+	[params bindValue:[NSDate date] atIndex:1];
+	[params bindValue:[NSNumber numberWithDouble:0.0] atIndex:3];
+	result = [query executeWithParameters:params];
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 	sleep(1);
 
-	[query bindValue:[NSDate date] atIndex:1];
-	[query bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
-	result = [query execute];
+	[params bindValue:[NSDate date] atIndex:1];
+	[params bindValue:[NSNumber numberWithDouble:1.0] atIndex:3];
+	result = [query executeWithParameters:params];
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 	sleep(2);
 
-	[query bindValue:[NSDate date] atIndex:1];
-	[query bindValue:[NSNumber numberWithDouble:2.0] atIndex:3];
-	result = [query execute];
+	[params bindValue:[NSDate date] atIndex:1];
+	[params bindValue:[NSNumber numberWithDouble:2.0] atIndex:3];
+	result = [query executeWithParameters:params];
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 
 	if ([conn commitTransaction] == NO) {
 		syslog(LOG_DEBUG, "commit transaction: %s", conn.errorMessage.UTF8String);
@@ -101,7 +129,8 @@ void test5(PGConnection *conn)
 		return;
 	};
 
-	printf("Result: %s\n", result.error.description.UTF8String);
+	if (result.status != kPGResultCommandOK)
+		printf("Result: %s\n", result.error.description.UTF8String);
 }
 
 void test6(PGConnection *conn)
