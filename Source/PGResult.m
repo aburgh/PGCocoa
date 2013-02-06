@@ -138,7 +138,7 @@ NSError * NSErrorFromPGresult(PGresult *result);
 	state->state = index;
 	state->itemsPtr = stackbuf;
 	state->mutationsPtr = (unsigned long *)self;  // Not sufficient if the instance is not read-only
-	
+
 	return i;
 }
 

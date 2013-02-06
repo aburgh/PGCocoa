@@ -32,7 +32,7 @@
 
 - (id)valueAtFieldIndex:(NSInteger)index
 {
-	return [_result valueAtRowIndex:rowNumber fieldIndex:index];
+	return [_result valueAtRowIndex:_rowNumber fieldIndex:index];
 }
 
 - (id)valueForKey:(NSString *)key
@@ -42,7 +42,7 @@
 	if (index == -1)
 		return [super valueForKey:key];
 	
-	return [_result valueAtRowIndex:rowNumber fieldIndex:index];
+	return [_result valueAtRowIndex:_rowNumber fieldIndex:index];
 }
 
 @end
