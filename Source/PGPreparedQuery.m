@@ -35,17 +35,19 @@
 	if (!_deallocated) {
 		char *query;
 		PGresult *result;
-		
+		PGExecStatusType status;
+
 		if (asprintf(&query, "DEALLOCATE %s;", _name.UTF8String) > 0) {
 
 			result = PQexec(_connection.conn, query);
 
-			if (PQresultStatus(result) == PGRES_COMMAND_OK) 
+			if ((status = PQresultStatus(result)) == PGRES_COMMAND_OK)
 				_deallocated = YES;
 			else
-				syslog(LOG_ERR, "DEALLOCATE %s: %s", _name.UTF8String, PQresultErrorMessage(result));
+				syslog(LOG_ERR, "DEALLOCATE %s: %s (%d)", _name.UTF8String, PQresultErrorMessage(result), status);
 
 			free(query);
+			PQclear(result);
 			
 		}
 		else {
