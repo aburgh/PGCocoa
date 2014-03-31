@@ -45,6 +45,7 @@ typedef enum {
 - (id)_initWithResult:(struct pg_result *)result;
 
 - (PGRow *)rowAtIndex:(NSUInteger)index;
+- (PGRow *)objectAtIndexedSubscript:(NSUInteger)idx;
 
 - (id)valueAtRowIndex:(NSUInteger)rowNum fieldIndex:(NSUInteger)fieldNum;
 - (NSUInteger)indexForFieldName:(NSString *)name;

@@ -75,6 +75,11 @@ NSError * NSErrorFromPGresult(PGresult *result);
 	return [[[PGRow alloc] _initWithResult:self rowNumber:index] autorelease];
 }
 
+- (PGRow *)objectAtIndexedSubscript:(NSUInteger)idx
+{
+	return [self rowAtIndex:idx];
+}
+
 - (NSArray *)rows
 {
 	NSUInteger rowCount = self.numberOfRows;

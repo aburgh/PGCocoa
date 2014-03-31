@@ -47,4 +47,7 @@ typedef enum {
 
 - (void)bindValues:(NSArray *)values;
 
+- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index;
+- (id)objectAtIndexedSubscript:(NSUInteger)idx;
+
 @end

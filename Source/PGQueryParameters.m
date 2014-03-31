@@ -153,6 +153,16 @@
 		[self bindValue:values[i] atIndex:i];
 }
 
+- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index
+{
+	[self bindValue:anObject atIndex:index];
+}
+
+- (id)objectAtIndexedSubscript:(NSUInteger)idx
+{
+	return _params[idx];
+}
+
 -(NSUInteger)count
 {
 	return _params.count;

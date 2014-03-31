@@ -10,7 +10,7 @@
 
 @class PGResult;
 
-@interface PGRow : NSObject 
+@interface PGRow : NSObject <NSFastEnumeration>
 {
 	PGResult *_result;
 	NSInteger _rowNumber;
@@ -20,6 +20,7 @@
 @property (readonly) NSInteger rowNumber;
 
 - (id)valueAtFieldIndex:(NSInteger)index;
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (id)valueForKey:(NSString *)key;
 
 @end
