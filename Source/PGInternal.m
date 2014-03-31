@@ -47,6 +47,7 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 	id value;
 	pg_valueref_t pgval;
 	long double interval;
+	int32_t tmp32;
 	int64_t tmp64;
 
 	pgval.string = bytes;
@@ -71,10 +72,12 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 			value = [NSNumber numberWithLongLong:NSSwapBigLongLongToHost(*pgval.val64)];
 			break;
 		case 700:  // float4
-			value = [NSNumber numberWithFloat:NSSwapBigIntToHost(*pgval.val32)];
+			tmp32 = NSSwapBigIntToHost(*pgval.val32);
+			value = [NSNumber numberWithFloat: *(float *) &tmp32];
 			break;
 		case 701:  // float8
-			value = [NSNumber numberWithDouble:NSSwapBigLongLongToHost(*pgval.val64)];
+			tmp64 = NSSwapBigLongLongToHost(*pgval.val64);
+			value = [NSNumber numberWithDouble: *(double *) &tmp64];
 			break;
 		case 1114:  // timestamp
 		case 1184:  // timestamptz
