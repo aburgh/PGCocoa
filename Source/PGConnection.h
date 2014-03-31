@@ -13,39 +13,39 @@
 @class PGQueryParameters;
 struct pg_conn;
 
-// Mapped directly to ConnStatusType
+/**  Mapped directly to ConnStatusType */
 typedef enum {
 	/*
 	 * Although it is okay to add to this list, values which become unused
 	 * should never be removed, nor should constants be redefined - that would
 	 * break compatibility with existing code.
 	 */
-	kPGConnectionOK,
-	kPGConnectionBad,
+	kPGConnectionOK,				/**< Connection OK */
+	kPGConnectionBad,				/**< Connection is bad */
 	/* Non-blocking mode only below here */
 
 	/*
 	 * The existence of these should never be relied upon - they should only
 	 * be used for user feedback or similar purposes.
 	 */
-	kPGConnectionStarted,			/* Waiting for connection to be made.  */
-	kPGConnectionMade,				/* Connection OK; waiting to send.	   */
-	kPGConnectionAwaitingResponse,	/* Waiting for a response from the
+	kPGConnectionStarted,			/**< Waiting for connection to be made.  */
+	kPGConnectionMade,				/**< Connection OK; waiting to send.	   */
+	kPGConnectionAwaitingResponse,	/**< Waiting for a response from the
 									 * postmaster.		  */
-	kPGConnectionAuthOK,			/* Received authentication; waiting for
+	kPGConnectionAuthOK,			/**< Received authentication; waiting for
 									 * backend startup. */
-	kPGConnectionSetEnv,			/* Negotiating environment. */
-	kPGConnectionSSL,				/* Negotiating SSL. */
-	kPGConnectionDisconnected		/* Internal state: connect() needed */
+	kPGConnectionSetEnv,			/**< Negotiating environment. */
+	kPGConnectionSSL,				/**< Negotiating SSL. */
+	kPGConnectionDisconnected		/**< Internal state: connect() needed */
 } PGConnStatusType;
 
-// Mapped directly to PGTransactionStatusType
+/** Mapped directly to PGTransactionStatusType */
 typedef enum {
-	kPGTransactionIdle,				/* connection idle */
-	kPGTransactionActive,			/* command in progress */
-	kPGTransactionInTransaction,	/* idle, within transaction block */
-	kPGTransactionInError,			/* idle, within failed transaction */
-	kPGTransactionUnknown			/* cannot determine status */
+	kPGTransactionIdle,				/**< connection idle */
+	kPGTransactionActive,			/**< command in progress */
+	kPGTransactionInTransaction,	/**< idle, within transaction block */
+	kPGTransactionInError,			/**< idle, within failed transaction */
+	kPGTransactionUnknown			/**< cannot determine status */
 } PGTransactStatusType;
 
 @interface PGConnection : NSObject 

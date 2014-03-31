@@ -11,22 +11,22 @@
 @class PGRow;
 struct pg_result;
 
-// Mapped directly to ExecStatusType
+/** Mapped directly to ExecStatusType */
 typedef enum {
-	kPGResultEmptyQuery = 0,	/* empty query string was executed */
-	kPGResultCommandOK,			/* a query command that doesn't return
+	kPGResultEmptyQuery = 0,	/**< empty query string was executed */
+	kPGResultCommandOK,			/**< a query command that doesn't return
 								 * anything was executed properly by the
 								 * backend */
-	kPGResultTuplesOK,			/* a query command that returns tuples was
+	kPGResultTuplesOK,			/**< a query command that returns tuples was
 								 * executed properly by the backend, PGresult
 								 * contains the result tuples */
-	kPGResultCopyOut,			/* Copy Out data transfer in progress */
-	kPGResultCopyIn,			/* Copy In data transfer in progress */
-	kPGResultBadResponse,		/* an unexpected response was recv'd from the
+	kPGResultCopyOut,			/**< Copy Out data transfer in progress */
+	kPGResultCopyIn,			/**< Copy In data transfer in progress */
+	kPGResultBadResponse,		/**< an unexpected response was recv'd from the
 								 * backend */
-	kPGResultNonFatalError,		/* notice or warning message */
-	kPGResultFatalError,		/* query failed */
-	kPGResultCopyBoth			/* Copy In/Out data transfer in progress */
+	kPGResultNonFatalError,		/**< notice or warning message */
+	kPGResultFatalError,		/**< query failed */
+	kPGResultCopyBoth			/**< Copy In/Out data transfer in progress */
 } PGExecStatusType;
 
 @interface PGResult : NSObject <NSFastEnumeration>
