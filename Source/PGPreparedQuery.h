@@ -19,7 +19,7 @@
 	NSString *_name;
 	
 //	NSMutableArray *_params;
-	BOOL _deallocated;			// indicator for status of the prepared query
+	BOOL _allocated;			// indicator for status of the prepared query
 	
 }
 

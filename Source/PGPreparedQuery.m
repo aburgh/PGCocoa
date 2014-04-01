@@ -32,7 +32,7 @@
 
 - (void)deallocate
 {
-	if (!_deallocated) {
+	if (_allocated) {
 		char *query;
 		PGresult *result;
 		PGExecStatusType status;
@@ -42,13 +42,12 @@
 			result = PQexec(_connection.conn, query);
 
 			if ((status = PQresultStatus(result)) == PGRES_COMMAND_OK)
-				_deallocated = YES;
+				_allocated = NO;
 			else
 				syslog(LOG_ERR, "DEALLOCATE %s: %s (%d)", _name.UTF8String, PQresultErrorMessage(result), status);
 
 			free(query);
 			PQclear(result);
-			
 		}
 		else {
 			perror("Error preparing DEALLOCATE");
@@ -58,7 +57,7 @@
 
 - (void)dealloc
 {
-	if (!_deallocated) [self deallocate];
+	if (_allocated) [self deallocate];
 	
 	[_name release];
 	[_query release];
@@ -73,10 +72,11 @@
 		_query = [query copy];
 		_name = [name copy];
 
-		_deallocated = NO;
-
 		PGresult *result = PQprepare(_connection.conn, _name.UTF8String, _query.UTF8String, numParams, paramTypes);
-		if (PQresultStatus(result) != PGRES_COMMAND_OK) {
+		if (PQresultStatus(result) == PGRES_COMMAND_OK) {
+			_allocated = YES;
+		}
+		else {
 			[self dealloc];
 			self = nil;
 		}
