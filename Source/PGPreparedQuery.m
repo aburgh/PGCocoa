@@ -20,12 +20,12 @@
 @implementation PGPreparedQuery
 
 
-+ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes connection:(PGConnection *)conn
++ (PGPreparedQuery *)queryWithName:(NSString *)name sql:(NSString *)sql types:(NSArray *)paramTypes connection:(PGConnection *)conn
 {
 	return [[[PGPreparedQuery alloc] initWithName:name query:sql types:paramTypes connection:conn] autorelease];
 }
 
-+ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn
++ (PGPreparedQuery *)queryWithName:(NSString *)name sql:(NSString *)sql types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn
 {
 	return [[[PGPreparedQuery alloc] initWithName:name query:sql types:paramTypes count:numParams connection:conn] autorelease];
 }

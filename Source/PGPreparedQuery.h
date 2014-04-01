@@ -23,9 +23,9 @@
 	
 }
 
-+ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(NSArray *)paramTypes connection:(PGConnection *)conn;
++ (PGPreparedQuery *)queryWithName:(NSString *)name sql:(NSString *)sql types:(NSArray *)paramTypes connection:(PGConnection *)conn;
 
-+ (PGPreparedQuery *)preparedQueryWithName:(NSString *)name query:(NSString *)sql types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn;
++ (PGPreparedQuery *)queryWithName:(NSString *)name sql:(NSString *)sql types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn;
 
 - (id)initWithName:(NSString *)name query:(NSString *)query types:(NSArray *)sampleParams connection:(PGConnection *)conn;
 

@@ -43,6 +43,8 @@ void test1(PGConnection *conn)
 	PGResult *result;
 	PGQueryParameters *params;
 
+	printf("%s:\n", __func__);
+
 	now = [NSDate date];
 	data = [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding];
 	values = @[now, now, @(98.62f), @(10023445.98373), data];
@@ -64,6 +66,8 @@ void test2(PGConnection *conn)
 	PGQueryParameters *params;
 	PGResult *result;
 
+	printf("%s:\n", __func__);
+
 	values = @[@(4), @"John", @"Doe"];
 	params = [PGQueryParameters queryParametersWithValues:values];
 	result = [conn executeQuery:qry_test2 parameters:params];
@@ -78,6 +82,8 @@ static NSString *qry_test3 = @"insert into testnums (f2) values ($1);";
 
 void test3(PGConnection *conn)
 {
+	printf("%s:\n", __func__);
+
 	NSArray *values = @[ @(10023445.98373) ];
 	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
 
@@ -93,6 +99,8 @@ static NSString *qry_test4 = @"insert into testnums (data) values ($1);";
 
 void test4(PGConnection *conn)
 {
+	printf("%s:\n", __func__);
+
 	NSArray *values = @[[@"Some sample data" dataUsingEncoding:NSUTF8StringEncoding]];
 	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
 
@@ -106,11 +114,13 @@ void test4(PGConnection *conn)
 
 void test5(PGConnection *conn)
 {
+	printf("%s:\n", __func__);
+
 	PGQueryParameterType types[] = { kPGQryParamTimestampTZ, kPGQryParamTimestampTZ, kPGQryParamFloat, kPGQryParamDouble, kPGQryParamData };
 
 	PGPreparedQuery *query;
-	query = [PGPreparedQuery preparedQueryWithName:@"test5"
-											 query:@"insert into testnums values ($1, $2, $3, $4, $5);"
+	query = [PGPreparedQuery queryWithName:@"test5"
+											 sql:@"insert into testnums values ($1, $2, $3, $4, $5);"
 											 types:types
 											 count:5
 										connection:conn];
@@ -119,6 +129,7 @@ void test5(PGConnection *conn)
 		syslog(LOG_DEBUG, "%s: error preparing query: %s", __func__, conn.errorMessage.UTF8String);
 		return;
 	}
+
 
 	if ([conn beginTransaction] == NO) {
 		syslog(LOG_DEBUG, "%s: begin transaction: %s", __func__, conn.errorMessage.UTF8String);
@@ -168,9 +179,11 @@ void test5(PGConnection *conn)
 
 void test6(PGConnection *conn)
 {
+	printf("%s:\n", __func__);
+
 	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;"];
-	printf("Headers: %s\n", [[result.fieldNames componentsJoinedByString:@", "] UTF8String]);
-	printf("Result:  %s\n", result.error.description.UTF8String);
+	printf("\tHeaders: %s\n", [[result.fieldNames componentsJoinedByString:@", "] UTF8String]);
+	printf("\tResult:  %s\n", result.error.description.UTF8String);
 }
 
 void test7(PGConnection *conn)
