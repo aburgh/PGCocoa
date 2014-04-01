@@ -161,7 +161,6 @@ NSError * NSErrorFromPGresult(PGresult *result);
 
 @end
 
-#pragma mark - 
 
 NSString * NSStringFromPGresultStatus(ExecStatusType status)
 {
