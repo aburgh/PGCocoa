@@ -67,7 +67,7 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 
 - (PGResult *)executeQuery:(NSString *)query
 {
-	PGresult *result = PQexec(_connection, query.UTF8String);
+	PGresult *result = PQexecParams(_connection, query.UTF8String, 0, NULL, NULL, NULL, NULL, 1);
 
 	return [[[PGResult alloc] _initWithResult:result] autorelease];
 }

@@ -33,6 +33,7 @@ typedef union pg_value {
 	void *   addr;
 	char     bytes[16];  // same length as long double
 //	char     bytes[8];
+	int8_t   val8;
 	int16_t  val16;
 	int32_t  val32;
 	int64_t  val64;

@@ -92,11 +92,22 @@
 		_lengths[i] = (int)[value length];
 		_formats[i] = 1;
 	}
+	else if ([value class] == NSClassFromString(@"__NSCFBoolean")) {
+		_types[i] = kPGQryParamBool;  // boolean
+		_values[i].val8 = [value boolValue];
+		_valueRefs[i] = _values[i].bytes;
+		_lengths[i] = 1;
+		_formats[i] = 1;
+	}
 	else if ([value isKindOfClass:NSNumber.class]) {
 
 		const char *objCType = [value objCType];
 		switch (objCType[0]) {
 			case 'c':
+				_types[i] = kPGQryParamInt8;  // char
+				_values[i].val8 = [value charValue];
+				_lengths[i] = 1;
+				_formats[i] = 1;
 			case 's':
 				_types[i] = kPGQryParamInt16; // int2
 				_values[i].val16 = NSSwapHostShortToBig([value shortValue]);

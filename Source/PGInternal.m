@@ -54,7 +54,7 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 
 	switch (oid) {
 		case 16: // bool
-			value = [NSNumber numberWithBool:(pgval.bytes[0] == 't')  ?  YES : NO];
+			value = [NSNumber numberWithBool:pgval.bytes[0]];
 			break;
 		case 17:  // bytea
 			value = [NSData dataWithBytes:pgval.bytes length:length];
