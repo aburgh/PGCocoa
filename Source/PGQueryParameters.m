@@ -69,13 +69,13 @@
 	// but check subclasses first (i.e., NSDecimalNumber before NSNumber).
 
 	if ([value isKindOfClass:NSString.class]) {
-		_types[i] = 25;	// text
+		_types[i] = kPGQryParamText;	// text
 		_valueRefs[i] = (char *)[value UTF8String];
 		_lengths[i] = 0;  // ignored
 		_formats[i] = 0;
 	}
 	else if ([value isKindOfClass:NSDate.class]) {
-		_types[i] = 1184; // timestamp == 1114, timestamptz == 1184
+		_types[i] = kPGQryParamTimestampTZ; // timestamp == 1114, timestamptz == 1184
 
 		long double interval = [value timeIntervalSinceReferenceDate]; // upcast to preserve precision
 		interval += 31622400.0; // timestamp(tz) ref date == 2000-01-01 midnight
@@ -87,7 +87,7 @@
 		_formats[i] = 1;
 	}
 	else if ([value isKindOfClass:NSData.class]) {
-		_types[i] = 17;  // bytea
+		_types[i] = kPGQryParamData;  // bytea
 		_valueRefs[i] = (char *)[value bytes];
 		_lengths[i] = (int)[value length];
 		_formats[i] = 1;
@@ -98,29 +98,29 @@
 		switch (objCType[0]) {
 			case 'c':
 			case 's':
-				_types[i] = 21; // int2
+				_types[i] = kPGQryParamInt16; // int2
 				_values[i].val16 = NSSwapHostShortToBig([value shortValue]);
 				_lengths[i] = 2;
 				break;
 			case 'i':
-				_types[i] = 23; // int4
+				_types[i] = kPGQryParamInt32; // int4
 				_values[i].val32 = NSSwapHostIntToBig([value intValue]);
 				_lengths[i] = 4;
 				break;
 			case 'q':
-				_types[i] = 20; // int8
+				_types[i] = kPGQryParamInt64; // int8
 				_values[i].val64 = NSSwapHostLongLongToBig([value longLongValue]);
 				_lengths[i] = 8;
 				break;
 			case 'f':
-				_types[i] = 700; // float4
+				_types[i] = kPGQryParamFloat; // float4
 				// store as float but swap as long long to prevent converting swap result to a float
 				_values[i].f = [value floatValue];
 				_values[i].val32 = NSSwapHostIntToBig(_values[i].val32);
 				_lengths[i] = 4;
 				break;
 			case 'd':
-				_types[i] = 701; // float8
+				_types[i] = kPGQryParamDouble; // float8
 				// store as double but swap as long long to prevent converting swap result to a double
 				_values[i].d = [value doubleValue];
 				_values[i].val64 = NSSwapHostLongLongToBig(_values[i].val64);
