@@ -10,22 +10,20 @@
 #import <Foundation/Foundation.h>
 #import <libpq-fe.h>
 
+#define NBASE 10000
+
+#define NUMERIC_POS    0X0000
+#define NUMERIC_NEG    0x4000
+#define NUMERIC_NAN    0xC000
+#define NUMERIC_NULL   0xF000
+
 // libpq binary format for numeric types. Always sent big-endian.
 typedef struct pg_numeric {
-	int16_t  count;
-	int16_t  exponent;
-#ifdef __LITTLE_ENDIAN__
-	uint16_t unknown1:6;
-	uint16_t negative:1;
-	uint16_t unknown2:9;
-#else
-	// untested
-	uint16_t unknown1:14;
-	uint16_t negative:1;
-	uint16_t unknown2:1;
-#endif
-	uint16_t scale;
-	uint16_t mantissa[];
+	int16_t  ndigits;
+	int16_t  nweight;
+	uint16_t negative;
+	uint16_t dscale;
+	uint16_t digits[10]; // Limited by NSDecimal's use of uint128_t for mantissa
 } pg_numeric_t;
 
 
@@ -60,4 +58,6 @@ void NSDecimalInit(NSDecimal *dcm, uint64_t mantissa, int8_t exp, BOOL isNegativ
 
 id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid);
 
-NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(pg_numeric_t *numeric);
+NSDecimalNumber * NSDecimalNumberFromNumeric(pg_numeric_t *numeric);
+
+pg_numeric_t * NumericFromNSDecimalNumber(NSDecimalNumber *value);

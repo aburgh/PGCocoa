@@ -99,6 +99,21 @@
 		_lengths[i] = 1;
 		_formats[i] = 1;
 	}
+	else if ([value isKindOfClass:[NSDecimalNumber class]]) {
+		NSString *valString = [value description];
+		[_params replaceObjectAtIndex:i withObject:valString];
+		_types[i] = kPGQryParamNumeric;
+		_valueRefs[i] = valString.UTF8String;
+		_lengths[i] = 0;  // ignored
+		_formats[i] = 0;
+
+//		pg_numeric_t *numeric = NumericFromNSDecimalNumber(value);
+//		_types[i] = kPGQryParamNumeric;
+//		_values[i].numeric = *numeric;
+//		_valueRefs[i] = _values[i].bytes;
+//		_lengths[i] = sizeof(numeric);
+//		_formats[i] = 1;
+	}
 	else if ([value isKindOfClass:NSNumber.class]) {
 
 		const char *objCType = [value objCType];

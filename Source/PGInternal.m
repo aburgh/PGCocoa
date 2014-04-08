@@ -93,7 +93,7 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 			value = [NSDate dateWithTimeIntervalSinceReferenceDate:interval];
 			break;
 		case 1700:  // numeric
-			value = NSDecimalNumberFromBinaryNumeric(pgval.numeric);
+			value = NSDecimalNumberFromNumeric(pgval.numeric);
 			break;
 		default:
 			value = [NSData dataWithBytes:pgval.bytes length:length];
@@ -103,36 +103,212 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 	return value;
 }
 
-NSDecimalNumber * NSDecimalNumberFromBinaryNumeric(pg_numeric_t *pgval)
+NSDecimalNumber * NSDecimalNumberFromNumeric(pg_numeric_t *pgval)
 {
-	NSDecimal accum[2], component;
-	NSCalculationError result;
+	NSDecimal decimal;
+	pg_numeric_t numeric;
+	__uint128_t mantissa;
 
-	accum[0] = [[NSDecimalNumber zero] decimalValue];
-	accum[1] = [[NSDecimalNumber zero] decimalValue];
+	numeric.ndigits  = NSSwapBigShortToHost(pgval->ndigits);
+	numeric.nweight  = NSSwapBigShortToHost(pgval->nweight);
+	numeric.negative = NSSwapBigShortToHost(pgval->negative);
+	numeric.dscale   = NSSwapBigShortToHost(pgval->dscale);
+	for (int i = 0; i < numeric.ndigits; i++)
+		numeric.digits[i] = NSSwapBigShortToHost(pgval->digits[i]);
 
-	BOOL isNegative = pgval->negative;
-
-	int count, j, k;
-
-	count = NSSwapBigShortToHost(pgval->count);
-	if (count > 9)
+	if (numeric.nweight > 31)
+		[NSException raise:NSDecimalNumberExactnessException format:@"Exponent of value from database out of bounds"];
+	if (numeric.ndigits > 9)
 		[NSException raise:NSDecimalNumberExactnessException format:@"Value from database exceeds 36 digits of precision"];
 
-	for (int i = 0; i < count; i++) {
-		uint16_t mantissa = NSSwapBigShortToHost(pgval->mantissa[i]);
-		uint16_t exponent = NSSwapBigShortToHost(pgval->exponent);
+	memset(&decimal, 0, sizeof(decimal));
 
-		NSDecimalInit(&component, mantissa, (exponent - i) << 2, isNegative);
-
-		// alternate between accum decimals to avoid copying the result
-		j = i & 0x1;
-		k = (i + 1) & 0x1;
-
-		result = NSDecimalAdd(&accum[j], &accum[k], &component, NSRoundPlain);
-		if (result != NSCalculationNoError) {
-			return [NSDecimalNumber notANumber];
-		}
+	if (numeric.negative == NUMERIC_NULL) {
+		return (id) NSNull.null;
 	}
-	return [NSDecimalNumber decimalNumberWithDecimal:accum[j]];
+	else if (numeric.negative == NUMERIC_NAN) {
+		decimal._length = 0;
+		decimal._isNegative = YES;
+	}
+	else {
+		decimal._length = 8;
+		decimal._isNegative = (numeric.negative == NUMERIC_NEG);
+		decimal._exponent = (numeric.nweight - (numeric.ndigits - 1)) * 4;
+
+		mantissa = 0;
+		for (int i = 0; i < numeric.ndigits; i++) {
+			mantissa *= NBASE;
+			mantissa += numeric.digits[i];
+		}
+		*(__int128_t *) &decimal._mantissa = mantissa;
+	}
+
+	return [NSDecimalNumber decimalNumberWithDecimal:decimal];
 }
+
+
+//#define NSDecimalMaxSize (8)
+//// Give a precision of at least 38 decimal digits, 128 binary positions.
+//
+//#define NSDecimalNoScale SHRT_MAX
+//
+//typedef struct {
+//    signed   int _exponent:8;
+//    unsigned int _length:4;     // length == 0 && isNegative -> NaN
+//    unsigned int _isNegative:1;
+//    unsigned int _isCompact:1;
+//    unsigned int _reserved:18;
+//    unsigned short _mantissa[NSDecimalMaxSize];
+//} NSDecimal;
+
+
+//#if 0
+//#define NBASE		10000
+//#define HALF_NBASE	5000
+//#define DEC_DIGITS	4			/* decimal digits per NBASE digit */
+//#define MUL_GUARD_DIGITS	2	/* these are measured in NBASE digits */
+//#define DIV_GUARD_DIGITS	4
+//
+//typedef int16_t NumericDigit;
+//
+//static const char *
+//set_var_from_str(const char *str, const char *cp, pg_numeric_t *dest)
+//{
+//	bool		have_dp = FALSE;
+//	int			i;
+//	unsigned char *decdigits;
+//	int			sign = NUMERIC_POS;
+//	int			dweight = -1;
+//	int			ddigits;
+//	int			dscale = 0;
+//	int			weight;
+//	int			ndigits;
+//	int			offset;
+//	NumericDigit *digits;
+//
+//	/*
+//	 * We first parse the string to extract decimal digits and determine the
+//	 * correct decimal weight.	Then convert to NBASE representation.
+//	 */
+//	switch (*cp)
+//	{
+//		case '+':
+//			sign = NUMERIC_POS;
+//			cp++;
+//			break;
+//
+//		case '-':
+//			sign = NUMERIC_NEG;
+//			cp++;
+//			break;
+//	}
+//
+//	if (*cp == '.')
+//	{
+//		have_dp = TRUE;
+//		cp++;
+//	}
+//
+//	if (!isdigit((unsigned char) *cp))
+//		[NSException raise:NSInvalidArgumentException format:@"invalid input syntax for type numeric: \"%s\"", str];
+//
+//	decdigits = (unsigned char *) malloc(strlen(cp) + DEC_DIGITS * 2);
+//
+//	/* leading padding for digit alignment later */
+//	memset(decdigits, 0, DEC_DIGITS);
+//	i = DEC_DIGITS;
+//
+//	while (*cp)
+//	{
+//		if (isdigit((unsigned char) *cp))
+//		{
+//			decdigits[i++] = *cp++ - '0';
+//			if (!have_dp)
+//				dweight++;
+//			else
+//				dscale++;
+//		}
+//		else if (*cp == '.')
+//		{
+//			if (have_dp)
+//				[NSException raise:NSInvalidArgumentException format:@"invalid input syntax for type numeric: \"%s\"", str];
+//			have_dp = TRUE;
+//			cp++;
+//		}
+//		else
+//			break;
+//	}
+//
+//	ddigits = i - DEC_DIGITS;
+//	/* trailing padding for digit alignment later */
+//	memset(decdigits + i, 0, DEC_DIGITS - 1);
+//
+//	/* Handle exponent, if any */
+//	if (*cp == 'e' || *cp == 'E')
+//	{
+//		long		exponent;
+//		char	   *endptr;
+//
+//		cp++;
+//		exponent = strtol(cp, &endptr, 10);
+//		if (endptr == cp)
+//			[NSException raise:NSInvalidArgumentException format:@"invalid input syntax for type numeric: \"%s\"", str];
+//		cp = endptr;
+//		if (exponent > 127 ||
+//			exponent < -127)
+//			[NSException raise:NSInvalidArgumentException format:@"invalid input syntax for type numeric: \"%s\"", str];
+//		dweight += (int) exponent;
+//		dscale -= (int) exponent;
+//		if (dscale < 0)
+//			dscale = 0;
+//	}
+//
+//	/*
+//	 * Okay, convert pure-decimal representation to base NBASE.  First we need
+//	 * to determine the converted weight and ndigits.  offset is the number of
+//	 * decimal zeroes to insert before the first given digit to have a
+//	 * correctly aligned first NBASE digit.
+//	 */
+//	if (dweight >= 0)
+//		weight = (dweight + 1 + DEC_DIGITS - 1) / DEC_DIGITS - 1;
+//	else
+//		weight = -((-dweight - 1) / DEC_DIGITS + 1);
+//	offset = (weight + 1) * DEC_DIGITS - (dweight + 1);
+//	ndigits = (ddigits + offset + DEC_DIGITS - 1) / DEC_DIGITS;
+//
+////	alloc_var(dest, ndigits);
+//	dest->ndigits = ndigits;
+//	dest->negative = sign;
+//	dest->nweight = weight;
+//	dest->dscale = dscale;
+//
+//	i = DEC_DIGITS - offset;
+//	digits = (NumericDigit *) dest->digits;
+//
+//	while (ndigits-- > 0)
+//	{
+//#if DEC_DIGITS == 4
+//		*digits++ = ((decdigits[i] * 10 + decdigits[i + 1]) * 10 +
+//					 decdigits[i + 2]) * 10 + decdigits[i + 3];
+//#elif DEC_DIGITS == 2
+//		*digits++ = decdigits[i] * 10 + decdigits[i + 1];
+//#elif DEC_DIGITS == 1
+//		*digits++ = decdigits[i];
+//#else
+//#error unsupported NBASE
+//#endif
+//		i += DEC_DIGITS;
+//	}
+//
+//	free(decdigits);
+//
+//	/* Strip any leading/trailing zeroes, and normalize weight if zero */
+////	strip_var(dest);
+//
+//	/* Return end+1 position for caller */
+//	return cp;
+//}
+//
+//#endif
+//
+
