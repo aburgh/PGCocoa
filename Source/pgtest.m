@@ -15,212 +15,241 @@
 #import <errno.h>
 #import <syslog.h>
 
-void simpleTest(PGConnection *conn)
-{
-	//	PGResult *result = [conn executeQuery:@"select * from pg_tablespace;"];
-	PGResult *result = [conn executeQuery:@"SELECT * FROM person"];
+static NSString *table_ints   = @"CREATE TEMP TABLE ints (val1 BOOLEAN, val16 SMALLINT, val32 INTEGER, val64 BIGINT);";
+static NSString *table_floats = @"CREATE TEMP TABLE floats (val4 FLOAT4, val8 DOUBLE PRECISION, val15 DECIMAL(30, 5));";
+static NSString *table_times  = @"CREATE TEMP TABLE times (val_ts TIMESTAMP, val_tz TIMESTAMPTZ);";
+static NSString *table_arrays = @"CREATE TEMP TABLE arrays (val_text TEXT, val_bytes BYTEA);";
 
-	printf("%s:\n", __func__);
-	printf("\tNumber of rows: %li\n", result.numberOfRows);
-	printf("\tNumber of cols: %li\n", result.numberOfFields);
-	
-	for (int i = 0; i < [result numberOfRows]; i++) {
-		for (int j = 0; j < [result numberOfFields]; j++) {
-			printf("\tRow: %i col: %i value: %s\n", i, j, [[[result valueAtRowIndex:i fieldIndex:j] description] cStringUsingEncoding:NSUTF8StringEncoding]);
-		}
-	}
-}
+static NSString *qryInsertInts   = @"INSERT INTO ints (val1, val16, val32, val64) VALUES ($1, $2, $3, $4);";
+static NSString *qryInsertFloats = @"INSERT INTO floats (val4, val8, val15) VALUES ($1, $2, $3);";
+static NSString *qryInsertTimes  = @"INSERT INTO times (val_ts, val_tz) VALUES ($1::timestamp, $2::timestamptz);";
+static NSString *qryInsertData   = @"INSERT INTO arrays (val_text, val_bytes) VALUES ($1, $2);";
+
+static NSString *qrySelectInts   = @"SELECT * FROM ints;";
+static NSString *qrySelectFloats = @"SELECT * FROM floats;";
+static NSString *qrySelectTimes  = @"SELECT * FROM times;";
+static NSString *qrySelectData   = @"SELECT * FROM arrays;";
+
+static NSString *qryDeleteInts   = @"DELETE FROM ints;";
+static NSString *qryDeleteFloats = @"DELETE FROM floats;";
+static NSString *qryDeleteTimes  = @"DELETE FROM times;";
+static NSString *qryDeleteData   = @"DELETE FROM arrays;";
+
 
 // ****************
+// table_ints  = @"CREATE TEMP TABLE ints (val1 BOOLEAN, val16 SMALLINT, val32 INTEGER, val64 BIGINT);";
+// qryTestInts = @"INSERT INTO ints (val1, val16, val32, val64) VALUES ($1, $2, $3, $4, $5);";
 
-static NSString * qry_test1 = @"insert into testnums values ($1, $2, $3, $4, $5);";
-
-void test1(PGConnection *conn)
+void TestInts(PGConnection *conn)
 {
-	NSDate *now;
-	NSData *data;
-	NSArray *values;
+	printf("%s:\n", __func__);
+
 	PGResult *result;
 	PGQueryParameters *params;
+	NSArray *values;
+	PGRow *row;
 
+	values = @[ @(YES), @(32000), @(123456789), @(12345678901234) ];
+
+	params = [PGQueryParameters queryParametersWithValues:values];
+
+	result = [conn executeQuery:qryInsertInts parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	result = [conn executeQuery:qrySelectInts];
+	if (result.status != kPGResultTuplesOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	row = result[0];
+	NSCAssert([row[0] isEqual:@(YES)], @"[row[0] isEqual:@(YES)]");
+	NSCAssert([row[1] isEqual:@(32000)], @"[row[1] isEqual:@(32000)]");
+	NSCAssert([row[2] isEqual:@(123456789)], @"[row[2] isEqual:@(123456789)]");
+	NSCAssert([row[3] isEqual:@(12345678901234)], @"[row[3] isEqual:@(12345678901234)]");
+
+	[conn executeQuery:qryDeleteInts];
+}
+
+void TestFloats(PGConnection *conn)
+{
 	printf("%s:\n", __func__);
+
+	PGResult *result;
+	NSArray *values;
+	NSDecimalNumber *decimal1, *decimal2;
+	PGQueryParameters *params;
+	PGRow *row;
+
+//	-12345,
+//	123456.123e11,
+//	123456.1234e13
+
+	//
+	decimal1 = [NSDecimalNumber decimalNumberWithString:@"1234567890.12345"];
+	values = @[ @(123.456), @(1234567890.12345), decimal1 ];
+	params = [PGQueryParameters queryParametersWithValues:values];
+
+	result = [conn executeQuery:qryInsertFloats parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	decimal2 = [NSDecimalNumber decimalNumberWithString:@"-1234567890.1234e15"];
+	values = @[ @(-1.2345e10), @(-1234567890.12345), decimal2];
+	params = [PGQueryParameters queryParametersWithValues:values];
+
+	result = [conn executeQuery:qryInsertFloats parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+
+	result = [conn executeQuery:qrySelectFloats];
+	if (result.status != kPGResultTuplesOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	row = result[0];
+	NSCAssert( [[row[0] description] isEqual:@"123.456"], @"row[0] ~ 123.456");
+	NSCAssert( [[row[1] description] isEqual:@"1234567890.12345"], @"row[1] ~ 1234567890.12345");
+	NSCAssert( [[row[2] description] isEqual:@"1234567890.12345"], @"row[2] ~ 1234567890.12345");
+
+	row = result[1];
+	NSCAssert( [[row[0] description] isEqual:@"-1.2345e+10"], @"row[0] ~ -1.2345e+10");
+	NSCAssert( [[row[1] description] isEqual:@"-1234567890.12345"], @"row[1] ~ -1234567890.12345");
+	NSCAssert( [[row[2] description] isEqual:@"-1234567890123400000000000"], @"row[2] ~ -1234567890123400000000000");
+
+}
+
+
+// @"CREATE TEMP TABLE times (val_ts TIMESTAMP, val_tz TIMESTAMPTZ);";
+
+void TestTimes(PGConnection *conn)
+{
+	printf("%s:\n", __func__);
+
+	PGResult *result;
+	PGRow *row;
+	NSDate *now, *date1, *date2;
+	NSString *date3, *date4;
+	NSTimeZone *gmt;
+	NSArray *values;
+	PGQueryParameters *params;
+	NSString *desc1, *desc2;
+
+	// insert row 1
 
 	now = [NSDate date];
-	data = [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding];
-	values = @[now, now, @(98.62f), @(10023445.98373), data];
+	values = @[ now, now ];
+
 	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qry_test1 parameters:params];
-
+	result = [conn executeQuery:qryInsertTimes parameters:params];
 	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-}
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
+	// insert row 2
+
+	date3 = @"2013-01-15 23:59:59";
+
+	values = @[ date3, date3 ];
+	params = [PGQueryParameters queryParametersWithValues:values];
+	result = [conn executeQuery:qryInsertTimes parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	// insert row 3
+
+	date4 = @"2013-01-15 23:59:59 +0000";
+
+	values = @[ date4, date4 ];
+	params = [PGQueryParameters queryParametersWithValues:values];
+	result = [conn executeQuery:qryInsertTimes parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	// insert row 4
+
+	date1 = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0]; // 1/1/2001
+
+	values = @[ date1, date1 ];
+	params = [PGQueryParameters queryParametersWithValues:values];
+	result = [conn executeQuery:qryInsertTimes parameters:params];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+//	// insert row 5
+//
+//	values = @[ @(0.0), @(0.0) ];
+//	params = [PGQueryParameters queryParametersWithValues:values];
+//	result = [conn executeQuery:qryInsertTimes parameters:params];
+//	if (result.status != kPGResultCommandOK)
+//		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	// fetch rows
+
+	result = [conn executeQuery:qrySelectTimes];
+	if (result.status != kPGResultTuplesOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	gmt = [NSTimeZone timeZoneWithName:@"GMT"];
+
+	for (row in result) {
+		desc1 = [row[0] descriptionWithCalendarFormat:nil timeZone:gmt locale:nil];
+		desc2 = [row[1] descriptionWithCalendarFormat:nil timeZone:gmt locale:nil];
+		printf("%s\n", desc1.UTF8String);
+		printf("%s\n", desc2.UTF8String);
+		putchar('\n');
+	}
+//TestTimes:
+//	2014-04-09 16:34:24 +0000
+//	2014-04-09 20:34:24 +0000
+//
+//	2013-01-15 23:59:59 +0000
+//	2013-01-16 04:59:59 +0000
+//
+//	2013-01-15 23:59:59 +0000
+//	2013-01-15 23:59:59 +0000
+//
+//	2000-12-31 19:00:00 +0000
+//	2001-01-01 00:00:00 +0000
+//	
+}
 
 // ****************
 
-static NSString *qry_test2 = @"INSERT INTO person(id, first, last) VALUES($1, $2, $3);";
+// CREATE TEMP TABLE arrays (val_text TEXT, val_bytes BYTEA);
 
-void test2(PGConnection *conn)
+void TestArrays(PGConnection *conn)
 {
+	printf("%s:\n", __func__);
+
+	PGResult *result;
+	PGRow *row;
+	NSData *data;
 	NSArray *values;
 	PGQueryParameters *params;
-	PGResult *result;
 
-	printf("%s:\n", __func__);
-
-	values = @[@(4), @"John", @"Doe"];
+	data = [@"This is some data" dataUsingEncoding:NSUTF8StringEncoding];
+	values = @[ NSNull.null, data ];
 	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qry_test2 parameters:params];
-
+	result = [conn executeQuery:qryInsertData parameters:params];
 	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	result = [conn executeQuery:qrySelectData];
+	if (result.status != kPGResultTuplesOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	row = result[0];
+	NSCAssert([row[1] isEqual:data], @"row[1] == data");
 }
-
-// ****************
-
-static NSString *qry_test3 = @"insert into testnums (f2) values ($1);";
-
-void test3(PGConnection *conn)
-{
-	printf("%s:\n", __func__);
-
-	NSArray *values = @[ @(10023445.98373) ];
-	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
-
-	PGResult *result = [conn executeQuery:qry_test3 parameters:params];
-
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-}
-
-// ****************
 
 static NSString *qry_test4 = @"insert into testnums (data) values ($1);";
 
-void test4(PGConnection *conn)
+void CreateTable(PGConnection *conn, NSString *qry)
 {
-	printf("%s:\n", __func__);
-
-	NSArray *values = @[[@"Some sample data" dataUsingEncoding:NSUTF8StringEncoding]];
-	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
-
-	PGResult *result = [conn executeQuery:qry_test4 parameters:params];
+	PGResult *result;
+	result = [conn executeQuery:qry];
 
 	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-}
-
-// ****************
-
-void test5(PGConnection *conn)
-{
-	printf("%s:\n", __func__);
-
-	PGQueryParameterType types[] = { kPGQryParamTimestampTZ, kPGQryParamTimestampTZ, kPGQryParamFloat, kPGQryParamDouble, kPGQryParamData };
-
-	PGPreparedQuery *query;
-	query = [PGPreparedQuery queryWithName:@"test5"
-											 sql:@"insert into testnums values ($1, $2, $3, $4, $5);"
-											 types:types
-											 count:5
-										connection:conn];
-
-	if (!query) {
-		syslog(LOG_DEBUG, "%s: error preparing query: %s", __func__, conn.errorMessage.UTF8String);
-		return;
-	}
-
-
-	if ([conn beginTransaction] == NO) {
-		syslog(LOG_DEBUG, "%s: begin transaction: %s", __func__, conn.errorMessage.UTF8String);
-		[query deallocate];
-		return;
-	};
-
-	// execute query
-
-	NSArray *values = @[NSDate.date, NSDate.date, [NSNumber numberWithFloat:98.62], [NSNumber numberWithDouble:10023445.98373], [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
-
-	PGQueryParameters *params = [PGQueryParameters queryParametersWithValues:values];
-
-	PGResult *result = [query executeWithParameters:params];
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-
-	params[1] = [NSDate date];
-	params[3] = @(0.0);
-	result = [query executeWithParameters:params];
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-	sleep(1);
-
-	params[1] = [NSDate date];
-	params[3] = @(1.0);
-	result = [query executeWithParameters:params];
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-	sleep(2);
-
-	params[1] = [NSDate date];
-	params[3] =@(2.0);
-	result = [query executeWithParameters:params];
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-
-	if ([conn commitTransaction] == NO) {
-		syslog(LOG_DEBUG, "commit transaction: %s", conn.errorMessage.UTF8String);
-		[query deallocate];
-		return;
-	};
-
-	if (result.status != kPGResultCommandOK)
-		warnx("%s: result: %s\n", __func__, result.error.description.UTF8String);
-}
-
-void test6(PGConnection *conn)
-{
-	printf("%s:\n", __func__);
-
-	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;"];
-	printf("\tHeaders: %s\n", [[result.fieldNames componentsJoinedByString:@", "] UTF8String]);
-	printf("\tResult:  %s\n", result.error.description.UTF8String);
-}
-
-void test7(PGConnection *conn)
-{
-	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;" parameters:nil];
-
-	printf("%s:\n", __func__);
-	printf("\t%s\n", [[result.fieldNames componentsJoinedByString:@"\t"] UTF8String]);
-	
-	for (int i = 0; i < result.numberOfRows; i++) {
-		putchar('\t');
-		for (int j = 0; j < result.numberOfFields; j++)
-			printf("%s\t", [[[result valueAtRowIndex:i fieldIndex:j] description] UTF8String]);
-		putchar('\n');
-	}
-}
-
-void test8(PGConnection *conn)
-{
-	PGResult *result = [conn executeQuery:@"SELECT * FROM testnums;" parameters:nil];
-	PGRow *row;
-	NSObject *field;
-
-	printf("%s:\n", __func__);
-	printf("\t%s\n", [[result.fieldNames componentsJoinedByString:@"\t"] UTF8String]);
-
-//	for (int i = 0; i < result.numberOfRows; i++) {
-//		row = result[i];
-//		for (int j = 0; j < result.numberOfFields; j++)
-//			printf("%s\t", [[row[j] description] UTF8String]);
-//		printf("\n");
-//	}
-	for (row in result) {
-		for (field in row)
-			printf("\t%s\t", field.description.UTF8String);
-		printf("\n");
-	}
+		err(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 }
 
 void DropTable(PGConnection *conn, NSString *name)
@@ -235,14 +264,13 @@ void DropTable(PGConnection *conn, NSString *name)
 		warnx("drop table '%s': %s", name.UTF8String, result.error.description.UTF8String);
 }
 
-static NSString *table_testnums = @"CREATE TABLE testnums (d1 TIMESTAMP, d2 TIMESTAMPTZ, f1 FLOAT, f2 DOUBLE PRECISION, data BYTEA);";
-static NSString *table_person = @"CREATE TABLE person (id SERIAL PRIMARY KEY, first TEXT, last TEXT);";
-
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
-	openlog("pgtest",  LOG_PERROR | LOG_CONS, LOG_USER);
+
+//	openlog("pgtest",  LOG_PERROR | LOG_CONS, LOG_USER);
 
 	@autoreleasepool {
+		PGResult *result;
 		PGConnection *conn;
 		NSDictionary *params;
 		NSArray *values;
@@ -257,42 +285,32 @@ int main(int argc, char *argv[])
 		}
 
 		[conn beginTransaction];
-//		values = @[[NSDate date], [NSDate date], @(98.62f), @(10023445.98373), [@"some bytes" dataUsingEncoding:NSUTF8StringEncoding]];
 
-		PGResult *result;
-		result = [conn executeQuery:table_testnums];
-		result = [conn executeQuery:table_person];
+		CreateTable(conn, table_ints);
+		CreateTable(conn, table_floats);
+		CreateTable(conn, table_times);
+		CreateTable(conn, table_arrays);
 
-		simpleTest(conn);
+		TestInts(conn);
 		putchar('\n');
 
-		test1(conn);
+		TestFloats(conn);
 		putchar('\n');
 
-		test2(conn);
+		TestTimes(conn);
 		putchar('\n');
 
-		test3(conn);
+		TestArrays(conn);
 		putchar('\n');
 
-		test4(conn);
-		putchar('\n');
-
-		test5(conn);
-		putchar('\n');
-
-		test6(conn);
-		putchar('\n');
-
-		test7(conn);
-		putchar('\n');
-
-		test8(conn);
-		putchar('\n');
 bail:
-		DropTable(conn, @"testnums");
-		DropTable(conn, @"person");
-		[conn rollbackTransaction];
+		DropTable(conn, @"ints");
+		DropTable(conn, @"floats");
+		DropTable(conn, @"times");
+		DropTable(conn, @"arrays");
+
+		[conn commitTransaction];
+//		[conn rollbackTransaction];
 		[conn disconnect];
 		[conn release];
 	}
