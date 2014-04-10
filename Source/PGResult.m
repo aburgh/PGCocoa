@@ -30,6 +30,11 @@ NSError * NSErrorFromPGresult(PGresult *result);
 
 @implementation PGResult
 
++ (instancetype)_resultWithResult:(PGresult *)result
+{
+	return [[[PGResult alloc] _initWithResult:result] autorelease];
+}
+
 - (id)_initWithResult:(PGresult *)result
 {
 	if (self = [super init]) {

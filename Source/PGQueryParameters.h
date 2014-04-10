@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+//#import "PGQueryParameters_Private.h"
 
 /** PG data types to which Cocoa objects can be mapped */
 typedef enum {
@@ -31,6 +32,7 @@ typedef enum {
 {
 	NSMutableArray *_params;
 
+	int _nparams;
 	unsigned int *_types;		// Same type as Oid
 	union pg_value *_values;
 	const char **_valueRefs;
@@ -38,17 +40,31 @@ typedef enum {
 	int *_formats;
 }
 
-@property (nonatomic, readonly) NSUInteger count;
+//@property (nonatomic, readonly) NSMutableArray *params;
+//@property (nonatomic, readonly) NSUInteger count;
 
-+ (id)queryParametersWithCapacity:(NSUInteger)count;
-
+/** Returns autoreleased instance of PGQueryParameters
+ * @param values array of basic types to bind (NSString, NSNull, NSDate, NSNumber, NSDecimalNumber, NSData)
+ * @return allocated and initialized instance
+ */
 + (id)queryParametersWithValues:(NSArray *)values;
 
-- (void)bindValue:(id)value atIndex:(NSUInteger)paramIndex;
+/** Initializes an instance of PGQueryParameters
+ * @param values array of basic types to bind (NSString, NSNull, NSDate, NSNumber, NSDecimalNumber, NSData)
+ * @return the initialized instance
+ */
+-(id)initWithValues:(NSArray *)values;
 
-- (void)bindValues:(NSArray *)values;
+/** Return PG query parameter arrays by reference
+ @param types array of Oid types
+ @param values array of value pointers
+ @param lengths array of value lengths
+ @param formats array of value formats (0 for string, 1 for binary)
+ @return the count of elements in arrays, -1 on error
+ */
+- (NSInteger)getNumberOfTypes:(unsigned int **)types values:(const char ***)values lengths:(int **)lengths formats:(int **)formats;
 
-- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index;
-- (id)objectAtIndexedSubscript:(NSUInteger)idx;
+//- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index;
+//- (id)objectAtIndexedSubscript:(NSUInteger)idx;
 
 @end

@@ -98,11 +98,27 @@
 	return self;
 }
 
-- (PGResult *)executeWithParameters:(PGQueryParameters *)params;
+- (PGResult *)executeWithValues:(NSArray *)values;
 {
-	PGresult *result = PQexecPrepared(_connection.conn, _name.UTF8String, params.count, params.valueRefs, params.lengths, params.formats, 1);
+	PGresult *result;
+	PGQueryParameters *params;
 
-	return [[[PGResult alloc] _initWithResult:result] autorelease];
+	NSInteger nParams;
+	unsigned int *types;
+	const char **valrefs;
+	int *lengths;
+	int *formats;
+
+	if ((params = [PGQueryParameters queryParametersWithValues:values]) == nil)
+		return nil;
+
+	nParams = [params getNumberOfTypes:&types values:&valrefs lengths:&lengths formats:&formats];
+	if (nParams < 0)
+		return nil;
+
+	result = PQexecPrepared(_connection.conn, _name.UTF8String, nParams, valrefs, lengths, formats, 1);
+
+	return [PGResult _resultWithResult:result];
 }
 
 @end

@@ -42,6 +42,8 @@ typedef enum {
 @property (readonly) PGExecStatusType status;
 @property (readonly) NSError *error;
 
++ (instancetype)_resultWithResult:(struct pg_result *)result;
+
 - (id)_initWithResult:(struct pg_result *)result;
 
 - (PGRow *)rowAtIndex:(NSUInteger)index;

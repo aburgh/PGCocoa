@@ -33,7 +33,6 @@
 		96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E9A8A916B79AD600071519 /* PGInternal.m */; };
 		96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 96EAFC8D1061C69C00DB0100 /* PGRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96EAFC901061C69C00DB0100 /* PGRow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EAFC8E1061C69C00DB0100 /* PGRow.m */; };
-		96F9324D16B7BA7C007D6207 /* PGQueryParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96F9324E16B7BA7C007D6207 /* PGQueryParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F9324C16B7BA7C007D6207 /* PGQueryParameters.m */; };
 		96F9325216B94539007D6207 /* libpq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96F9325116B94539007D6207 /* libpq.dylib */; };
 /* End PBXBuildFile section */
@@ -277,7 +276,6 @@
 				96DAFDD40E2B50D800406253 /* PGConnection.h in Headers */,
 				96A56A480E5260D6005D0556 /* PGResult.h in Headers */,
 				96A56A4C0E526E14005D0556 /* PGError.h in Headers */,
-				96F9324D16B7BA7C007D6207 /* PGQueryParameters.h in Headers */,
 				96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */,
 				96976C450E69864700325EE2 /* PGInternal.h in Headers */,
 				96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */,

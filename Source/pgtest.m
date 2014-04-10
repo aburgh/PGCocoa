@@ -45,15 +45,12 @@ void TestInts(PGConnection *conn)
 	printf("%s:\n", __func__);
 
 	PGResult *result;
-	PGQueryParameters *params;
 	NSArray *values;
 	PGRow *row;
 
 	values = @[ @(YES), @(32000), @(123456789), @(12345678901234) ];
 
-	params = [PGQueryParameters queryParametersWithValues:values];
-
-	result = [conn executeQuery:qryInsertInts parameters:params];
+	result = [conn executeQuery:qryInsertInts values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -77,7 +74,6 @@ void TestFloats(PGConnection *conn)
 	PGResult *result;
 	NSArray *values;
 	NSDecimalNumber *decimal1, *decimal2;
-	PGQueryParameters *params;
 	PGRow *row;
 
 //	-12345,
@@ -87,17 +83,15 @@ void TestFloats(PGConnection *conn)
 	//
 	decimal1 = [NSDecimalNumber decimalNumberWithString:@"1234567890.12345"];
 	values = @[ @(123.456), @(1234567890.12345), decimal1 ];
-	params = [PGQueryParameters queryParametersWithValues:values];
 
-	result = [conn executeQuery:qryInsertFloats parameters:params];
+	result = [conn executeQuery:qryInsertFloats values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
 	decimal2 = [NSDecimalNumber decimalNumberWithString:@"-1234567890.1234e15"];
 	values = @[ @(-1.2345e10), @(-1234567890.12345), decimal2];
-	params = [PGQueryParameters queryParametersWithValues:values];
 
-	result = [conn executeQuery:qryInsertFloats parameters:params];
+	result = [conn executeQuery:qryInsertFloats values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -139,8 +133,7 @@ void TestTimes(PGConnection *conn)
 	now = [NSDate date];
 	values = @[ now, now ];
 
-	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qryInsertTimes parameters:params];
+	result = [conn executeQuery:qryInsertTimes values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -149,8 +142,7 @@ void TestTimes(PGConnection *conn)
 	date3 = @"2013-01-15 23:59:59";
 
 	values = @[ date3, date3 ];
-	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qryInsertTimes parameters:params];
+	result = [conn executeQuery:qryInsertTimes values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -159,8 +151,7 @@ void TestTimes(PGConnection *conn)
 	date4 = @"2013-01-15 23:59:59 +0000";
 
 	values = @[ date4, date4 ];
-	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qryInsertTimes parameters:params];
+	result = [conn executeQuery:qryInsertTimes values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -169,8 +160,7 @@ void TestTimes(PGConnection *conn)
 	date1 = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0]; // 1/1/2001
 
 	values = @[ date1, date1 ];
-	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qryInsertTimes parameters:params];
+	result = [conn executeQuery:qryInsertTimes values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
@@ -228,8 +218,7 @@ void TestArrays(PGConnection *conn)
 
 	data = [@"This is some data" dataUsingEncoding:NSUTF8StringEncoding];
 	values = @[ NSNull.null, data ];
-	params = [PGQueryParameters queryParametersWithValues:values];
-	result = [conn executeQuery:qryInsertData parameters:params];
+	result = [conn executeQuery:qryInsertData values:values];
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 

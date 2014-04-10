@@ -69,16 +69,33 @@ NSInteger PGSecondsFromUTC(PGConnection *conn);
 {
 	PGresult *result = PQexecParams(_connection, query.UTF8String, 0, NULL, NULL, NULL, NULL, 1);
 
-	return [[[PGResult alloc] _initWithResult:result] autorelease];
+	return [PGResult _resultWithResult:result];
 }
 
-- (PGResult *)executeQuery:(NSString *)query parameters:(PGQueryParameters *)params
+- (PGResult *)executeQuery:(NSString *)query values:(NSArray *)values
 {
 	PGresult *result;
+	PGQueryParameters *params;
 
-	result = PQexecParams(_connection, query.UTF8String, params.count, params.types, params.valueRefs, params.lengths, params.formats, 1);
+	if ((params = [PGQueryParameters queryParametersWithValues:values]) == nil)
+		return nil;
 
-	return [[[PGResult alloc] _initWithResult:result] autorelease];
+	// extern PGresult *PQexecParams(PGconn *conn,
+//	const char *command,
+	int nParams;
+	Oid *types;
+	const char ** valrefs;
+	int *lengths;
+	int *formats;
+	int resultFormat;
+
+	nParams = [params getNumberOfTypes:&types values:&valrefs lengths:&lengths formats:&formats];
+	if (nParams < 0)
+		return nil;
+
+	result = PQexecParams(_connection, query.UTF8String, nParams, types, valrefs, lengths, formats, 1);
+
+	return [PGResult _resultWithResult:result];
 }
 
 - (NSString *)errorMessage

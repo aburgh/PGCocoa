@@ -12,32 +12,37 @@
 
 @implementation PGQueryParameters
 
-+ (id)queryParametersWithCapacity:(NSUInteger)numItems
-{
-	return [[[PGQueryParameters alloc] initWithCapacity:numItems] autorelease];
-}
 
 + (id)queryParametersWithValues:(NSArray *)values
 {
-	PGQueryParameters *params = [PGQueryParameters queryParametersWithCapacity:values.count];
-	[params bindValues:values];
-
-	return params;
+	return  [[[PGQueryParameters alloc] initWithValues:values] autorelease];
 }
 
--(id)initWithCapacity:(NSUInteger)numItems
+- (BOOL)_allocArraysWithCapacity:(NSUInteger)numItems
+{
+	if (_nparams >= numItems && _types && _values && _valueRefs && _lengths && _formats)
+		return YES;
+
+	if (_types) free(_types);
+	if (_values) free(_values);
+	if (_valueRefs) free(_valueRefs);
+	if (_lengths) free(_lengths);
+	if (_formats) free(_formats);
+
+	_types     = calloc(numItems, sizeof(Oid));
+	_values    = calloc(numItems, sizeof(pg_value_t));
+	_valueRefs = calloc(numItems, sizeof(char *));
+	_lengths   = calloc(numItems, sizeof(int));
+	_formats   = calloc(numItems, sizeof(int));
+	_nparams = numItems;
+
+	return (_types && _values && _valueRefs && _lengths && _formats);
+}
+
+-(id)initWithValues:(NSArray *)values
 {
 	if (self = [super init]) {
-
-		_params = [[NSMutableArray alloc] initWithCapacity:numItems];
-		for (int i = 0; i < numItems; i++)
-			[_params addObject:[NSNull null]];
-		
-		_types     = calloc(numItems, sizeof(Oid));
-		_values    = calloc(numItems, sizeof(pg_value_t));
-		_valueRefs = calloc(numItems, sizeof(char *));
-		_lengths   = calloc(numItems, sizeof(int));
-		_formats   = calloc(numItems, sizeof(int));
+		_params = [values mutableCopy];
 	}
 
 	return self;
@@ -54,12 +59,8 @@
 	[super dealloc];
 }
 
-- (void)bindValue:(id)value atIndex:(NSUInteger)i;
+- (void)_bindValue:(id)value atIndex:(NSUInteger)i;
 {
-	// This implementation copied from PGPreparedQuery
-
-	[_params replaceObjectAtIndex:i withObject:value];
-
 	// The default storage for timestamps in PostgreSQL 8.4 is int64 in microseconds. Prior to
 	// 8.4, the default was a double, and is still a compile-time option. Supporting floats
 	// is an exercise for the reader. Hint: the integer_datetimes connection parameter reflects
@@ -87,9 +88,10 @@
 		_formats[i] = 1;
 	}
 	else if ([value isKindOfClass:NSData.class]) {
+		NSData *data = (NSData *)value;
 		_types[i] = kPGQryParamData;  // bytea
-		_valueRefs[i] = (char *)[value bytes];
-		_lengths[i] = (int)[value length];
+		_valueRefs[i] = data.bytes;
+		_lengths[i] = data.length;
 		_formats[i] = 1;
 	}
 	else if ([value class] == NSClassFromString(@"__NSCFBoolean")) {
@@ -115,40 +117,41 @@
 //		_formats[i] = 1;
 	}
 	else if ([value isKindOfClass:NSNumber.class]) {
+		NSNumber *number = (NSNumber *)value;
 
 		const char *objCType = [value objCType];
 		switch (objCType[0]) {
 			case 'c':
 				_types[i] = kPGQryParamInt8;  // char
-				_values[i].val8 = [value charValue];
+				_values[i].val8 = number.charValue;
 				_lengths[i] = 1;
 				_formats[i] = 1;
 			case 's':
 				_types[i] = kPGQryParamInt16; // int2
-				_values[i].val16 = NSSwapHostShortToBig([value shortValue]);
+				_values[i].val16 = NSSwapHostShortToBig(number.shortValue);
 				_lengths[i] = 2;
 				break;
 			case 'i':
 				_types[i] = kPGQryParamInt32; // int4
-				_values[i].val32 = NSSwapHostIntToBig([value intValue]);
+				_values[i].val32 = NSSwapHostIntToBig(number.intValue);
 				_lengths[i] = 4;
 				break;
 			case 'q':
 				_types[i] = kPGQryParamInt64; // int8
-				_values[i].val64 = NSSwapHostLongLongToBig([value longLongValue]);
+				_values[i].val64 = NSSwapHostLongLongToBig(number.longLongValue);
 				_lengths[i] = 8;
 				break;
 			case 'f':
 				_types[i] = kPGQryParamFloat; // float4
 				// store as float but swap as long long to prevent converting swap result to a float
-				_values[i].f = [value floatValue];
+				_values[i].f = number.floatValue;
 				_values[i].val32 = NSSwapHostIntToBig(_values[i].val32);
 				_lengths[i] = 4;
 				break;
 			case 'd':
 				_types[i] = kPGQryParamDouble; // float8
 				// store as double but swap as long long to prevent converting swap result to a double
-				_values[i].d = [value doubleValue];
+				_values[i].d = number.doubleValue;
 				_values[i].val64 = NSSwapHostLongLongToBig(_values[i].val64);
 				_lengths[i] = 8;
 				break;
@@ -167,31 +170,48 @@
 	}
 }
 
-- (void)bindValues:(NSArray *)values;
+- (BOOL)_bindValues
 {
-	// This implementation copied from PGPreparedQuery
+	if ([self _allocArraysWithCapacity:_params.count] == NO)
+		return NO;
 
-	NSUInteger count = values.count;
+	NSUInteger count = 0;
 
-	NSAssert(_params.count == count, @"Number of values doesn't match the number of query parameters.");
+	for (id value in _params)
+		[self _bindValue:value atIndex:count++];
 
-	for (int i = 0; i < count; i++)
-		[self bindValue:values[i] atIndex:i];
+	return YES;
 }
 
-- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index
+- (NSInteger)getNumberOfTypes:(unsigned int **)types values:(const char ***)values lengths:(int **)lengths formats:(int **)formats
 {
-	[self bindValue:anObject atIndex:index];
+	if ([self _allocArraysWithCapacity:_params.count] == NO)
+		return -1;
+
+	if ([self _bindValues] == NO)
+		return -1;
+	
+	*types = _types;
+	*values = _valueRefs;
+	*lengths = _lengths;
+	*formats = _formats;
+
+	return _nparams;
 }
 
-- (id)objectAtIndexedSubscript:(NSUInteger)idx
-{
-	return _params[idx];
-}
-
--(NSUInteger)count
-{
-	return _params.count;
-}
+//- (void)setObject:(id)anObject atIndexedSubscript:(NSUInteger)index
+//{
+//	_params[index] = anObject;
+//}
+//
+//- (id)objectAtIndexedSubscript:(NSUInteger)idx
+//{
+//	return _params[idx];
+//}
+//
+//-(NSUInteger)count
+//{
+//	return _params.count;
+//}
 
 @end

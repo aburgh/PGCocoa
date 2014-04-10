@@ -31,7 +31,7 @@
 
 - (id)initWithName:(NSString *)name query:(NSString *)query types:(PGQueryParameterType *)paramTypes count:(NSUInteger)numParams connection:(PGConnection *)conn;
 
-- (PGResult *)executeWithParameters:(PGQueryParameters *)params;
+- (PGResult *)executeWithValues:(NSArray *)values;
 
 - (void)deallocate;
 
