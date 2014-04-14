@@ -36,10 +36,6 @@ static NSString *qryDeleteTimes  = @"DELETE FROM times;";
 static NSString *qryDeleteData   = @"DELETE FROM arrays;";
 
 
-// ****************
-// table_ints  = @"CREATE TEMP TABLE ints (val1 BOOLEAN, val16 SMALLINT, val32 INTEGER, val64 BIGINT);";
-// qryTestInts = @"INSERT INTO ints (val1, val16, val32, val64) VALUES ($1, $2, $3, $4, $5);";
-
 void TestInts(PGConnection *conn)
 {
 	printf("%s:\n", __func__);
@@ -76,11 +72,6 @@ void TestFloats(PGConnection *conn)
 	NSDecimalNumber *decimal1, *decimal2;
 	PGRow *row;
 
-//	-12345,
-//	123456.123e11,
-//	123456.1234e13
-
-	//
 	decimal1 = [NSDecimalNumber decimalNumberWithString:@"1234567890.12345"];
 	values = @[ @(123.456), @(1234567890.12345), decimal1 ];
 
@@ -111,9 +102,6 @@ void TestFloats(PGConnection *conn)
 	NSCAssert( [[row[2] description] isEqual:@"-1234567890123400000000000"], @"row[2] ~ -1234567890123400000000000");
 
 }
-
-
-// @"CREATE TEMP TABLE times (val_ts TIMESTAMP, val_tz TIMESTAMPTZ);";
 
 void TestTimes(PGConnection *conn)
 {
@@ -164,13 +152,6 @@ void TestTimes(PGConnection *conn)
 	if (result.status != kPGResultCommandOK)
 		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
-//	// insert row 5
-//
-//	values = @[ @(0.0), @(0.0) ];
-//	params = [PGQueryParameters queryParametersWithValues:values];
-//	result = [conn executeQuery:qryInsertTimes parameters:params];
-//	if (result.status != kPGResultCommandOK)
-//		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
 
 	// fetch rows
 
@@ -201,10 +182,6 @@ void TestTimes(PGConnection *conn)
 //	2001-01-01 00:00:00 +0000
 //	
 }
-
-// ****************
-
-// CREATE TEMP TABLE arrays (val_text TEXT, val_bytes BYTEA);
 
 void TestArrays(PGConnection *conn)
 {
