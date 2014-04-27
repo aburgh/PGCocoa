@@ -70,7 +70,7 @@
 	if (self = [super init]) {
 		_connection = [conn retain];
 		_query = [query copy];
-		_name = [name copy];
+		_name = name ? [name copy] : @"";
 
 		PGresult *result = PQprepare(_connection.conn, _name.UTF8String, _query.UTF8String, numParams, paramTypes);
 		if (PQresultStatus(result) == PGRES_COMMAND_OK) {
