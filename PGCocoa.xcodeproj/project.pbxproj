@@ -30,10 +30,13 @@
 		96DAFDD40E2B50D800406253 /* PGConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 96DAFDD20E2B50D800406253 /* PGConnection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96DAFDD50E2B50D800406253 /* PGConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 96DAFDD30E2B50D800406253 /* PGConnection.m */; };
 		96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 96E9A8A916B79AD600071519 /* PGInternal.m */; };
+		96E9AF331951267200714421 /* libpq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E9AF321951267200714421 /* libpq.a */; };
+		96E9AF35195126E500714421 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E9AF34195126E500714421 /* libssl.dylib */; };
+		96E9AF37195126F600714421 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E9AF36195126F600714421 /* libcrypto.dylib */; };
+		96E9AF391951279300714421 /* LDAP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E9AF381951279300714421 /* LDAP.framework */; };
 		96EAFC8F1061C69C00DB0100 /* PGRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 96EAFC8D1061C69C00DB0100 /* PGRow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96EAFC901061C69C00DB0100 /* PGRow.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EAFC8E1061C69C00DB0100 /* PGRow.m */; };
 		96F9324E16B7BA7C007D6207 /* PGQueryParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F9324C16B7BA7C007D6207 /* PGQueryParameters.m */; };
-		96F9325216B94539007D6207 /* libpq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 96F9325116B94539007D6207 /* libpq.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +71,7 @@
 		32DBCF5E0370ADEE00C91783 /* PGCocoa_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCocoa_Prefix.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* PGCocoa.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PGCocoa.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9610B7440E223E1B000E25B2 /* pgsql */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pgsql; path = /usr/local/pgsql; sourceTree = "<absolute>"; };
+		9610B7440E223E1B000E25B2 /* pgsql */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pgsql; sourceTree = SOURCE_ROOT; };
 		96976C340E6942AE00325EE2 /* PGPreparedQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPreparedQuery.h; sourceTree = "<group>"; };
 		96976C350E6942AE00325EE2 /* PGPreparedQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPreparedQuery.m; sourceTree = "<group>"; };
 		96976C440E69864700325EE2 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
@@ -93,6 +96,10 @@
 		96DAFDD20E2B50D800406253 /* PGConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGConnection.h; sourceTree = "<group>"; };
 		96DAFDD30E2B50D800406253 /* PGConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGConnection.m; sourceTree = "<group>"; };
 		96E9A8A916B79AD600071519 /* PGInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInternal.m; sourceTree = "<group>"; };
+		96E9AF321951267200714421 /* libpq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpq.a; path = pgsql/lib/libpq.a; sourceTree = "<group>"; };
+		96E9AF34195126E500714421 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
+		96E9AF36195126F600714421 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
+		96E9AF381951279300714421 /* LDAP.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDAP.framework; path = System/Library/Frameworks/LDAP.framework; sourceTree = SDKROOT; };
 		96EAFC8D1061C69C00DB0100 /* PGRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRow.h; sourceTree = "<group>"; };
 		96EAFC8E1061C69C00DB0100 /* PGRow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRow.m; sourceTree = "<group>"; };
 		96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGQueryParameters.h; sourceTree = "<group>"; };
@@ -107,8 +114,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96F9325216B94539007D6207 /* libpq.dylib in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+				96E9AF391951279300714421 /* LDAP.framework in Frameworks */,
+				96E9AF331951267200714421 /* libpq.a in Frameworks */,
+				96E9AF37195126F600714421 /* libcrypto.dylib in Frameworks */,
+				96E9AF35195126E500714421 /* libssl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +164,10 @@
 		0867D691FE84028FC02AAC07 /* PGCocoa */ = {
 			isa = PBXGroup;
 			children = (
+				96E9AF381951279300714421 /* LDAP.framework */,
+				96E9AF36195126F600714421 /* libcrypto.dylib */,
+				96E9AF34195126E500714421 /* libssl.dylib */,
+				96E9AF321951267200714421 /* libpq.a */,
 				08FB77AEFE84172EC02AAC07 /* Classes */,
 				32C88DFF0371C24200C91783 /* Other Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
@@ -500,6 +514,10 @@
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/pgsql/lib",
+				);
 				PRODUCT_NAME = PGCocoa;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -517,6 +535,10 @@
 				GCC_PREFIX_HEADER = Source/PGCocoa_Prefix.pch;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/pgsql/lib",
+				);
 				PRODUCT_NAME = PGCocoa;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -528,7 +550,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/usr/local/pgsql/include,
+					"\"$(SRCROOT)/pgsql/include\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
@@ -540,7 +562,7 @@
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/usr/local/pgsql/include,
+					"\"$(SRCROOT)/pgsql/include\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 			};
