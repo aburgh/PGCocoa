@@ -215,12 +215,12 @@ void TestPreparedInts(PGConnection *conn)
 	PGPreparedQuery *query;
 	PGRow *row;
 	NSArray *values;
-	short myshort = 32000;
+
 	query = [PGPreparedQuery queryWithName:@"test" sql:qryInsertInts types:nil connection:conn];
 	if (!query)
 		errx(EXIT_FAILURE, "prepare: %s", conn.error.description.UTF8String);
 
-	values = @[ @(YES), @(32000), @(123456789), @(12345678901234) ];
+	values = @[ @(YES), @((short)32000), @(123456789), @(12345678901234) ];
 
 	result = [query executeWithValues:values];
 	if (result.status != kPGResultCommandOK)
