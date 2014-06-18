@@ -207,7 +207,39 @@ void TestArrays(PGConnection *conn)
 	NSCAssert([row[1] isEqual:data], @"row[1] == data");
 }
 
-static NSString *qry_test4 = @"insert into testnums (data) values ($1);";
+void TestPreparedInts(PGConnection *conn)
+{
+	printf("%s:\n", __func__);
+
+	PGResult *result;
+	PGPreparedQuery *query;
+	PGRow *row;
+	NSArray *values;
+	short myshort = 32000;
+	query = [PGPreparedQuery queryWithName:@"test" sql:qryInsertInts types:nil connection:conn];
+	if (!query)
+		errx(EXIT_FAILURE, "prepare: %s", conn.error.description.UTF8String);
+
+	values = @[ @(YES), @(32000), @(123456789), @(12345678901234) ];
+
+	result = [query executeWithValues:values];
+	if (result.status != kPGResultCommandOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	result = [conn executeQuery:qrySelectInts];
+	if (result.status != kPGResultTuplesOK)
+		errx(EXIT_FAILURE, "%s", result.error.description.UTF8String);
+
+	row = result[0];
+	NSCAssert([row[0] isEqual:@(YES)], @"[row[0] isEqual:@(YES)]");
+	NSCAssert([row[1] isEqual:@(32000)], @"[row[1] isEqual:@(32000)]");
+	NSCAssert([row[2] isEqual:@(123456789)], @"[row[2] isEqual:@(123456789)]");
+	NSCAssert([row[3] isEqual:@(12345678901234)], @"[row[3] isEqual:@(12345678901234)]");
+
+	[conn executeQuery:qryDeleteInts];
+
+	[query deallocate];
+}
 
 void CreateTable(PGConnection *conn, NSString *qry)
 {
@@ -257,16 +289,19 @@ int main(int argc, char *argv[])
 		CreateTable(conn, table_times);
 		CreateTable(conn, table_arrays);
 
-		TestInts(conn);
-		putchar('\n');
-
-		TestFloats(conn);
-		putchar('\n');
-
-		TestTimes(conn);
-		putchar('\n');
-
-		TestArrays(conn);
+//		TestInts(conn);
+//		putchar('\n');
+//
+//		TestFloats(conn);
+//		putchar('\n');
+//
+//		TestTimes(conn);
+//		putchar('\n');
+//
+//		TestArrays(conn);
+//		putchar('\n');
+//
+		TestPreparedInts(conn);
 		putchar('\n');
 
 bail:
