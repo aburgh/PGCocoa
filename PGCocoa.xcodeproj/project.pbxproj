@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
-		9610C08B0E22450D000E25B2 /* flash_image_importer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9610C08A0E22450D000E25B2 /* flash_image_importer.c */; };
 		96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C340E6942AE00325EE2 /* PGPreparedQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96976C370E6942AE00325EE2 /* PGPreparedQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976C350E6942AE00325EE2 /* PGPreparedQuery.m */; };
 		96976C450E69864700325EE2 /* PGInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 96976C440E69864700325EE2 /* PGInternal.h */; settings = {ATTRIBUTES = (); }; };
@@ -69,10 +68,7 @@
 		32DBCF5E0370ADEE00C91783 /* PGCocoa_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCocoa_Prefix.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* PGCocoa.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PGCocoa.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9610B72F0E2236EA000E25B2 /* flash_image_importer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = flash_image_importer; sourceTree = BUILT_PRODUCTS_DIR; };
 		9610B7440E223E1B000E25B2 /* pgsql */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pgsql; path = /usr/local/pgsql; sourceTree = "<absolute>"; };
-		9610C0890E22450D000E25B2 /* flash_image_importer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flash_image_importer.h; sourceTree = "<group>"; };
-		9610C08A0E22450D000E25B2 /* flash_image_importer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flash_image_importer.c; sourceTree = "<group>"; };
 		96976C340E6942AE00325EE2 /* PGPreparedQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPreparedQuery.h; sourceTree = "<group>"; };
 		96976C350E6942AE00325EE2 /* PGPreparedQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPreparedQuery.m; sourceTree = "<group>"; };
 		96976C440E69864700325EE2 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
@@ -116,13 +112,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9610B72D0E2236EA000E25B2 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		96976DFF0E6E135C00325EE2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -155,7 +144,6 @@
 			isa = PBXGroup;
 			children = (
 				8DC2EF5B0486A6940098B216 /* PGCocoa.framework */,
-				9610B72F0E2236EA000E25B2 /* flash_image_importer */,
 				96A56A7B0E527628005D0556 /* PGResultTest.octest */,
 				96A56A850E52768D005D0556 /* pgtest */,
 				96976E010E6E135C00325EE2 /* PGQuery Tool.app */,
@@ -246,8 +234,6 @@
 				96976C440E69864700325EE2 /* PGInternal.h */,
 				96E9A8A916B79AD600071519 /* PGInternal.m */,
 				32DBCF5E0370ADEE00C91783 /* PGCocoa_Prefix.pch */,
-				9610C0890E22450D000E25B2 /* flash_image_importer.h */,
-				9610C08A0E22450D000E25B2 /* flash_image_importer.c */,
 				96A56A8A0E5276C1005D0556 /* pgtest.m */,
 			);
 			name = "Other Source";
@@ -305,22 +291,6 @@
 			productReference = 8DC2EF5B0486A6940098B216 /* PGCocoa.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		9610B72E0E2236EA000E25B2 /* flash_image_importer */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9610B7390E2236ED000E25B2 /* Build configuration list for PBXNativeTarget "flash_image_importer" */;
-			buildPhases = (
-				9610B72C0E2236EA000E25B2 /* Sources */,
-				9610B72D0E2236EA000E25B2 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = flash_image_importer;
-			productName = flash_image_importer.c;
-			productReference = 9610B72F0E2236EA000E25B2 /* flash_image_importer */;
-			productType = "com.apple.product-type.tool";
-		};
 		96976E000E6E135C00325EE2 /* PGQuery Tool */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 96976E060E6E135D00325EE2 /* Build configuration list for PBXNativeTarget "PGQuery Tool" */;
@@ -356,7 +326,7 @@
 			name = PGResultTest;
 			productName = PGResultTest;
 			productReference = 96A56A7B0E527628005D0556 /* PGResultTest.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		96A56A840E52768D005D0556 /* pgtest */ = {
 			isa = PBXNativeTarget;
@@ -396,7 +366,6 @@
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* PGCocoa */,
-				9610B72E0E2236EA000E25B2 /* flash_image_importer */,
 				96A56A7A0E527628005D0556 /* PGResultTest */,
 				96A56A840E52768D005D0556 /* pgtest */,
 				96976E000E6E135C00325EE2 /* PGQuery Tool */,
@@ -459,14 +428,6 @@
 				96EAFC901061C69C00DB0100 /* PGRow.m in Sources */,
 				96E9A8AA16B79AD700071519 /* PGInternal.m in Sources */,
 				96F9324E16B7BA7C007D6207 /* PGQueryParameters.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9610B72C0E2236EA000E25B2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9610C08B0E22450D000E25B2 /* flash_image_importer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,34 +543,6 @@
 					/usr/local/pgsql/include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-			};
-			name = Release;
-		};
-		9610B7310E2236EB000E25B2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = flash_image_importer;
-			};
-			name = Debug;
-		};
-		9610B7320E2236EB000E25B2 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = flash_image_importer;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -747,15 +680,6 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9610B7390E2236ED000E25B2 /* Build configuration list for PBXNativeTarget "flash_image_importer" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9610B7310E2236EB000E25B2 /* Debug */,
-				9610B7320E2236EB000E25B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
