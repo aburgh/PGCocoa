@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PGQueryParameters.h"
+#import <PGCocoa/PGQueryParameters.h>
 
 @class PGConnection;
 @class PGResult;

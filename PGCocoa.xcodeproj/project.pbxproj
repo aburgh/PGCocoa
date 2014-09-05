@@ -20,6 +20,7 @@
 		96976E370E6E22B100325EE2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 96976E360E6E22B100325EE2 /* main.m */; };
 		96976E3C0E6E231000325EE2 /* PGCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* PGCocoa.framework */; };
 		96976E440E6E231B00325EE2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		969B031719B70DFD004F617F /* PGQueryParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F9324B16B7BA7C007D6207 /* PGQueryParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A56A480E5260D6005D0556 /* PGResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A460E5260D6005D0556 /* PGResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A56A490E5260D6005D0556 /* PGResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A56A470E5260D6005D0556 /* PGResult.m */; };
 		96A56A4C0E526E14005D0556 /* PGError.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A56A4A0E526E14005D0556 /* PGError.h */; };
@@ -276,6 +277,7 @@
 				96DAFDD40E2B50D800406253 /* PGConnection.h in Headers */,
 				96A56A480E5260D6005D0556 /* PGResult.h in Headers */,
 				96A56A4C0E526E14005D0556 /* PGError.h in Headers */,
+				969B031719B70DFD004F617F /* PGQueryParameters.h in Headers */,
 				96976C360E6942AE00325EE2 /* PGPreparedQuery.h in Headers */,
 				96976C450E69864700325EE2 /* PGInternal.h in Headers */,
 				96976C4A0E6988A500325EE2 /* PGCocoa.h in Headers */,
@@ -507,6 +509,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -528,6 +531,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
