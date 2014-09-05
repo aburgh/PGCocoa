@@ -71,6 +71,10 @@ id NSObjectFromPGBinaryValue(char *bytes, int length, Oid oid)
 		case 20:  // int8
 			value = [NSNumber numberWithLongLong:NSSwapBigLongLongToHost(*pgval.val64)];
 			break;
+		case 25:   // text
+		case 1043: // varchar
+			value = [[[NSString alloc] initWithBytes:bytes length:length encoding:NSUTF8StringEncoding] autorelease];
+			break;
 		case 700:  // float4
 			tmp32 = NSSwapBigIntToHost(*pgval.val32);
 			value = [NSNumber numberWithFloat: *(float *) &tmp32];
@@ -131,7 +135,6 @@ NSDecimalNumber * NSDecimalNumberFromNumeric(pg_numeric_t *pgval)
 		decimal._isNegative = YES;
 	}
 	else {
-		decimal._length = 8;
 		decimal._isNegative = (numeric.negative == NUMERIC_NEG);
 		decimal._exponent = (numeric.nweight - (numeric.ndigits - 1)) * 4;
 
@@ -141,6 +144,9 @@ NSDecimalNumber * NSDecimalNumberFromNumeric(pg_numeric_t *pgval)
 			mantissa += numeric.digits[i];
 		}
 		*(__int128_t *) &decimal._mantissa = mantissa;
+
+		// NSDecimal will enter an infinite loop if mantissa == 0 and _length > 0
+		decimal._length = mantissa == 0 ? 0 : 8;
 	}
 
 	return [NSDecimalNumber decimalNumberWithDecimal:decimal];

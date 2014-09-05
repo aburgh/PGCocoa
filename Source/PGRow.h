@@ -18,9 +18,13 @@
 
 @property (retain, readonly) PGResult *result;
 @property (readonly) NSInteger rowNumber;
+@property (readonly) NSArray *fieldNames;
+@property (readonly) NSUInteger numberOfFields;
+@property (readonly) NSArray *allValues;
 
 - (id)valueAtFieldIndex:(NSInteger)index;
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
+- (id)objectForKeyedSubscript:(id)key;
 - (id)valueForKey:(NSString *)key;
 
 @end

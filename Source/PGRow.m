@@ -39,6 +39,16 @@
 	return [_result valueAtRowIndex:_rowNumber fieldIndex:index];
 }
 
+- (id)objectForKeyedSubscript:(id)key
+{
+	NSInteger index = [_result indexForFieldName:key];
+
+	if (index == -1)
+		return [super valueForKey:key];
+
+	return [_result valueAtRowIndex:_rowNumber fieldIndex:index];
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len
 {
 	NSUInteger i, maxLen, index;
@@ -56,14 +66,29 @@
 	return i;
 }
 
+- (NSUInteger)numberOfFields
+{
+	return _result.numberOfFields;
+}
+
+- (NSArray *)fieldNames
+{
+	return _result.fieldNames;
+}
+
 - (id)valueForKey:(NSString *)key
 {
-	NSInteger index = [_result indexForFieldName:key];
-	
-	if (index == -1)
-		return [super valueForKey:key];
-	
-	return [_result valueAtRowIndex:_rowNumber fieldIndex:index];
+	return [self objectForKeyedSubscript:key];
+}
+
+- (NSArray *)allValues
+{
+	NSMutableArray *values = [NSMutableArray array];
+
+	for (int i = 0; i < _result.numberOfFields; i++)
+		[values addObject:[_result valueAtRowIndex:_rowNumber fieldIndex:index]];
+
+	return values;
 }
 
 @end
